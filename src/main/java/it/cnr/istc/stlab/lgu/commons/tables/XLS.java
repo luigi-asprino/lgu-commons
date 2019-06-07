@@ -1,4 +1,4 @@
-package it.cnr.istc.stlab.lgu.commons.spreadsheets;
+package it.cnr.istc.stlab.lgu.commons.tables;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

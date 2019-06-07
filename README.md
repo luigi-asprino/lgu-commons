@@ -16,6 +16,6 @@ mvn clean install
 <dependency>
 	<groupId>it.cnr.istc.stlab</groupId>
 	<artifactId>lgu.commons</artifactId>
-	<version>0.0.2</version>
+	<version>0.0.3</version>
 </dependency>
 ```
