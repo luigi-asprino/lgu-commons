@@ -13,6 +13,7 @@ import au.com.bytecode.opencsv.CSVWriter;
 
 public class CSVToJavaUtils {
 
+	//TODO test!
 	public static RowsIterator getRowsIterator(String fileCSVPath, char separator) throws FileNotFoundException {
 
 		CSVReader reader = new CSVReader(new FileReader(fileCSVPath), separator);
@@ -22,13 +23,16 @@ public class CSVToJavaUtils {
 
 			@Override
 			public String[] next() {
-				return null;
+				return nextRow;
 			}
 
 			@Override
 			public boolean hasNext() {
 				try {
-					return (nextRow = reader.readNext()) != null;
+					boolean hasNext = (nextRow = reader.readNext()) != null;
+					if (!hasNext)
+						reader.close();
+					return hasNext;
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
