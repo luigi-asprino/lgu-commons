@@ -23,13 +23,7 @@
 
 	</build>
 
-	<distributionManagement>
-		<repository>
-			<id>internal</id>
-			<url>file://${project.basedir}/mvn-repo</url>
-		</repository>
-	</distributionManagement>
-
+	
 	<dependencies>
 
 		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
