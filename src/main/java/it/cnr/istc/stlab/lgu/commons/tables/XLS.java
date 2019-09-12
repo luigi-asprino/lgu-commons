@@ -23,7 +23,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
  * 
- * This class encloses a set of facilities for reading and writing XLS and XLSX files. It is based on Apache POI library.
+ * This class encloses a set of facilities for reading and writing XLS and XLSX
+ * files. It is based on Apache POI library.
  * 
  * @author lgu
  *
@@ -62,22 +63,24 @@ public class XLS {
 		Iterator<Row> rows = currentSheet.iterator();
 		while (rows.hasNext()) {
 			Row currentRow = rows.next();
-			String[] rowOut = new String[currentRow.getLastCellNum()];
-			Iterator<Cell> cells = currentRow.iterator();
-			while (cells.hasNext()) {
-				Cell currentCell = cells.next();
-				if (currentCell.getCellType() == Cell.CELL_TYPE_BOOLEAN) {
-					rowOut[currentCell.getColumnIndex()] = currentCell.getBooleanCellValue() + "";
-				} else if (currentCell.getCellType() == Cell.CELL_TYPE_FORMULA) {
-					rowOut[currentCell.getColumnIndex()] = currentCell.getCellFormula();
-				} else if (currentCell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
-					Double d = currentCell.getNumericCellValue();
-					rowOut[currentCell.getColumnIndex()] = d.doubleValue() + "";
-				} else {
-					rowOut[currentCell.getColumnIndex()] = currentCell.getStringCellValue();
+			if (currentRow.getLastCellNum() > 0) {
+				String[] rowOut = new String[currentRow.getLastCellNum()];
+				Iterator<Cell> cells = currentRow.iterator();
+				while (cells.hasNext()) {
+					Cell currentCell = cells.next();
+					if (currentCell.getCellType() == Cell.CELL_TYPE_BOOLEAN) {
+						rowOut[currentCell.getColumnIndex()] = currentCell.getBooleanCellValue() + "";
+					} else if (currentCell.getCellType() == Cell.CELL_TYPE_FORMULA) {
+						rowOut[currentCell.getColumnIndex()] = currentCell.getCellFormula();
+					} else if (currentCell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+						Double d = currentCell.getNumericCellValue();
+						rowOut[currentCell.getColumnIndex()] = d.doubleValue() + "";
+					} else {
+						rowOut[currentCell.getColumnIndex()] = currentCell.getStringCellValue();
+					}
 				}
+				result.add(rowOut);
 			}
-			result.add(rowOut);
 		}
 		return result;
 	}
@@ -107,7 +110,8 @@ public class XLS {
 
 		for (int i = 0; i < numberOfSheets; i++) {
 			List<String[]> rowsOfSheet = this.getRowsOfSheet(i);
-			rowsOut.add("<div class=\"table-responsive\">" + "<table class=\"table table-striped\">" + "<caption style=\"text-align: center\">InsertCaption</caption>" + "<thead>");
+			rowsOut.add("<div class=\"table-responsive\">" + "<table class=\"table table-striped\">"
+					+ "<caption style=\"text-align: center\">InsertCaption</caption>" + "<thead>");
 
 			Iterator<String[]> rowsOfSheetIterator = rowsOfSheet.iterator();
 			String[] first = rowsOfSheetIterator.next();

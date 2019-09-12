@@ -124,7 +124,7 @@ public class FileUtils {
 	public static String readFile(String filename, boolean keepCR) {
 		String result = "";
 		try {
-			BufferedReader br = new BufferedReader(new FileReader(filename));
+			BufferedReader br = new BufferedReader(new FileReader(new File(filename)));
 			StringBuilder sb = new StringBuilder();
 			String line = br.readLine();
 			while (line != null) {
