@@ -47,8 +47,8 @@ public class Geonames {
 		}
 
 		sb.append("&name_equals=" + text.replace(" ", "%20"));
-		
-		System.out.println(sb.toString());
+
+//		System.out.println(sb.toString());
 
 		String r = HTTPUtils.makeGetRequest(sb.toString());
 		Model m = ModelFactory.createDefaultModel();
@@ -76,7 +76,7 @@ public class Geonames {
 		getGeoNames("Europa").forEach(u -> {
 			System.out.println(u);
 		});
-		getGeoNames("Manziana").forEach(u -> {
+		getGeoNames("Albano Laziale ").forEach(u -> {
 			System.out.println(u);
 		});
 	}
