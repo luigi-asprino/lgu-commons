@@ -1,7 +1,6 @@
 package it.cnr.istc.stlab.lgu.commons.entitylinking;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
