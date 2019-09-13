@@ -1,10 +1,12 @@
 package it.cnr.istc.stlab.lgu.commons.entitylinking;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResIterator;
@@ -18,15 +20,13 @@ import it.cnr.istc.stlab.lgu.commons.web.HTTPUtils;
 
 public class Geonames {
 
-	private static final String URL_BASE = "http://api.geonames.org/search?type=rdf";
+	private static final String URL_BASE = "http://api.geonames.org/search?type=rdf",
+			CACHED_RESULTS_FOLDER = "CACHED_RESULTS";
 	private static String USERNAME = null;
 
-	public static List<String> getGeoNames(String text, String country, String lang, String[] featureClasses)
+	public static String getGeoNamesRDF(String text, String country, String lang, String[] featureClasses)
 			throws IOException {
-
-		if (USERNAME == null) {
-			USERNAME = FileUtils.readFile("geonames.username");
-		}
+		new File(CACHED_RESULTS_FOLDER).mkdir();
 
 		StringBuilder sb = new StringBuilder();
 		sb.append(URL_BASE);
@@ -48,9 +48,28 @@ public class Geonames {
 
 		sb.append("&name_equals=" + text.replace(" ", "%20"));
 
-//		System.out.println(sb.toString());
+		if (USERNAME == null) {
+			USERNAME = FileUtils.readFile("geonames.username");
+		}
 
-		String r = HTTPUtils.makeGetRequest(sb.toString());
+		String r;
+		String textDigest = DigestUtils.md5Hex(text + sb.toString());
+
+		if (new File(CACHED_RESULTS_FOLDER + "/" + textDigest).exists()) {
+			r = FileUtils.readFile(CACHED_RESULTS_FOLDER + "/" + textDigest);
+		} else {
+			r = HTTPUtils.makeGetRequest(sb.toString());
+			FileUtils.toTextFile(r, CACHED_RESULTS_FOLDER + "/" + textDigest);
+		}
+		return r;
+
+	}
+
+	public static List<String> getGeoNames(String text, String country, String lang, String[] featureClasses)
+			throws IOException {
+
+		String r = getGeoNamesRDF(text, country, lang, featureClasses);
+
 		Model m = ModelFactory.createDefaultModel();
 		RDFDataMgr.read(m, new ByteArrayInputStream(r.getBytes()), Lang.RDFXML);
 		ResIterator ri = m.listSubjectsWithProperty(RDF.type,
@@ -66,6 +85,10 @@ public class Geonames {
 
 	public static List<String> getGeoNames(String text) throws IOException {
 		return getGeoNames(text, "IT", "it", new String[] { "A", "L" });
+	}
+	
+	public static String getGeoNamesRDF(String text) throws IOException {
+		return getGeoNamesRDF(text, "IT", "it", new String[] { "A", "L" });
 	}
 
 	public static List<String> getGeoNames(String text, String[] featureClass) throws IOException {
