@@ -22,6 +22,11 @@
 		</plugins>
 
 	</build>
+	
+	
+	<properties>
+		<orgjson.version>20180130</orgjson.version>
+	</properties>
 
 	
 	<dependencies>
@@ -115,6 +120,14 @@
 			<type>pom</type>
 			<version>3.11.0</version>
 		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/org.json/json -->
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>${orgjson.version}</version>
+		</dependency>
+		
 		
 
 	</dependencies>
