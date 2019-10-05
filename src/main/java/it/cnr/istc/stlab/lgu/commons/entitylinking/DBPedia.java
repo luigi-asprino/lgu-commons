@@ -23,7 +23,7 @@ import it.cnr.istc.stlab.lgu.commons.model.Entity;
 public class DBPedia {
 
 	private static final String CACHED_RESULTS_FOLDER = "dbpedia_cached_results";
-	private static Logger logger = LoggerFactory.getLogger(TagMe.class);
+	private static Logger logger = LoggerFactory.getLogger(DBPedia.class);
 
 	public static Entity getGeoCodingFromURI(String uri) throws FileNotFoundException {
 		new File(CACHED_RESULTS_FOLDER).mkdir();
