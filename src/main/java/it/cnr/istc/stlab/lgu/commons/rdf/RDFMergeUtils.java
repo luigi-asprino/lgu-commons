@@ -21,6 +21,13 @@ public class RDFMergeUtils {
 
 	public static void mergeFolders(Map<String, String> nsPrefixes, String[] folderPath, String fileOut, String lang)
 			throws FileNotFoundException {
+		Model m = mergeFolders(nsPrefixes, folderPath);
+		logger.info("Writing model");
+		m.write(new FileOutputStream(new File(fileOut)), lang);
+		logger.info("Model Written");
+	}
+
+	public static Model mergeFolders(Map<String, String> nsPrefixes, String[] folderPath) throws FileNotFoundException {
 		Model m = ModelFactory.createDefaultModel();
 		m.setNsPrefixes(nsPrefixes);
 		for (int i = 0; i < folderPath.length; i++) {
@@ -38,11 +45,7 @@ public class RDFMergeUtils {
 			logger.info("{} processed", folderPath[i]);
 		}
 		logger.info("Model size {}", m.size());
-		logger.info("Writing model");
-		m.write(new FileOutputStream(new File(fileOut)), lang);
-		logger.info("Model Written");
+		return m;
 	}
-
-	
 
 }
