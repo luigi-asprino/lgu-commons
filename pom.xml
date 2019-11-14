@@ -8,6 +8,33 @@
 	<version>0.0.4</version>
 	<packaging>jar</packaging>
 
+	<name>lgu.commons</name>
+	<description>A set of common JAVA facilities.</description>
+	<url>https://github.com/luigi-asprino/lgu-commons</url>
+
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>https://raw.githubusercontent.com/luigi-asprino/lgu-commons/master/LICENSE</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<name>Luigi Asprino</name>
+			<email>luigi.asprino@istc.cnr.it</email>
+			<organization>STLab (ISTC-CNR)</organization>
+			<organizationUrl>http://stlab.istc.cnr.it/</organizationUrl>
+		</developer>
+	</developers>
+
+	<scm>
+		<connection>scm:git:git://github.com/luigi-asprino/lgu-commons.git</connection>
+		<developerConnection>scm:git:ssh://github.com:luigi-asprino/lgu-commons.git</developerConnection>
+		<url>http://github.com/luigi-asprino/lgu-commons/tree/master</url>
+	</scm>
+
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<plugins>
@@ -20,12 +47,23 @@
 				</configuration>
 			</plugin>
 		</plugins>
-
 	</build>
 
 
 	<properties>
+		<apachecommonscsv.version>1.5</apachecommonscsv.version>
+		<apachecommonsconfiguration.version>2.1.1</apachecommonsconfiguration.version>
+		<apachejena.version>3.11.0</apachejena.version>
+		<apachepoi.version>3.14</apachepoi.version>
+		<commonsbeanutils.version>1.9.3</commonsbeanutils.version>
+		<commonsio.version>2.6</commonsio.version>
+		<googleapis.version>v4-rev581-1.25.0</googleapis.version>
+		<googlemapsapi.version>0.10.1</googlemapsapi.version>
+		<guava.version>27.0.1-jre</guava.version>
+		<junit.version>3.8.1</junit.version>
+		<opencsv.version>2.3</opencsv.version>
 		<orgjson.version>20180130</orgjson.version>
+		<slf4j.version>1.7.7</slf4j.version>
 	</properties>
 
 
@@ -35,7 +73,7 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>27.0.1-jre</version>
+			<version>${guava.version}</version>
 		</dependency>
 
 
@@ -43,27 +81,27 @@
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>2.6</version>
+			<version>${commonsio.version}</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-csv -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-csv</artifactId>
-			<version>1.5</version>
+			<version>${apachecommonscsv.version}</version>
 		</dependency>
 
 		<!-- http://mvnrepository.com/artifact/net.sf.opencsv/opencsv -->
 		<dependency>
 			<groupId>net.sf.opencsv</groupId>
 			<artifactId>opencsv</artifactId>
-			<version>2.3</version>
+			<version>${opencsv.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
+			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -72,7 +110,7 @@
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
-			<version>3.14</version>
+			<version>${apachepoi.version}</version>
 		</dependency>
 
 
@@ -80,30 +118,30 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-configuration2</artifactId>
-			<version>2.1.1</version>
+			<version>${apachecommonsconfiguration.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
-			<version>1.9.3</version>
+			<version>${commonsbeanutils.version}</version>
 		</dependency>
 
 		<!-- Logging LOG4J - SLF4J -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.7.7</version>
+			<version>${slf4j.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-jdk14</artifactId>
-			<version>1.7.7</version>
+			<version>${slf4j.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.google.apis</groupId>
 			<artifactId>google-api-services-sheets</artifactId>
-			<version>v4-rev581-1.25.0</version>
+			<version>${googleapis.version}</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.google.oauth-client/google-oauth-client-jetty -->
@@ -118,7 +156,7 @@
 			<groupId>org.apache.jena</groupId>
 			<artifactId>apache-jena-libs</artifactId>
 			<type>pom</type>
-			<version>3.11.0</version>
+			<version>${apachejena.version}</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.json/json -->
@@ -132,13 +170,13 @@
 		<dependency>
 			<groupId>com.google.maps</groupId>
 			<artifactId>google-maps-services</artifactId>
-			<version>0.10.1</version>
+			<version>${googlemapsapi.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
-			<version>1.7.25</version>
+			<version>${slf4j.version}</version>
 		</dependency>
 
 
