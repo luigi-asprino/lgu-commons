@@ -23,7 +23,7 @@ public class QueryExecutor {
 	}
 	
 	public static void main(String[] args) {
-		queryTDB("/Users/lgu/Desktop/fn17", "SELECT * {?s ?p ?o} LIMIT 10");
+		queryTDB("/Users/lgu/Desktop/fn17", "SELECT * {?s a <https://w3id.org/framester/framenet/tbox/Frame>} LIMIT 10");
 	}
 
 }
