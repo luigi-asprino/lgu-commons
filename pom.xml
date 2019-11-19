@@ -5,7 +5,7 @@
 
 	<groupId>it.cnr.istc.stlab</groupId>
 	<artifactId>lgu.commons</artifactId>
-	<version>0.0.4</version>
+	<version>0.0.5</version>
 	<packaging>jar</packaging>
 
 	<name>lgu.commons</name>
