@@ -21,9 +21,10 @@ public class QueryExecutor {
 		}
 		d.end();
 	}
-	
+
 	public static void main(String[] args) {
-		queryTDB("/Users/lgu/Desktop/fn17", "SELECT * {?s a <https://w3id.org/framester/framenet/tbox/Frame>} LIMIT 10");
+		queryTDB("/Users/lgu/Dropbox/repository/workspace/pss.services/tempFolder/TDB",
+				"SELECT * {?s a <https://w3id.org/pss/ontology/Document>} LIMIT 100");
 	}
 
 }

@@ -25,6 +25,8 @@ import org.apache.jena.tdb.TDBFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import it.cnr.istc.stlab.lgu.commons.iterations.ProgressCounter;
+
 /**
  * 
  * A WalkGenerator derived from RDF2Vec
@@ -73,12 +75,9 @@ public class WalkGenerator {
 
 		logger.info("Number of entities {}", entities.size());
 		int entitiesProcessed = 0;
-		int progress10 = entities.size() / 10;
+		ProgressCounter pc = new ProgressCounter(entitiesProcessed);
 
 		for (String e : entities) {
-			if (entitiesProcessed % progress10 == 0) {
-				logger.info("{}%", (entitiesProcessed / progress10) * 10);
-			}
 			pss.setIri("entity", e);
 			executeQuery(d, pss.toString(), e, separator, prefixMap).forEach(s -> {
 				try {
@@ -89,7 +88,7 @@ public class WalkGenerator {
 					e1.printStackTrace();
 				}
 			});
-			entitiesProcessed++;
+			pc.increase();
 		}
 		fos.close();
 
@@ -164,10 +163,16 @@ public class WalkGenerator {
 		String selectPart = "SELECT ?p ?o1";
 		String mainPart = "{ ?entity ?p ?o1  ";
 		String query = "";
+		
 		for (int i = 1; i < depth; i++) {
-			mainPart += ". ?o" + i + " ?p" + i + "?o" + (i + 1);
+			mainPart += ". OPTIONAL {?o" + i + " ?p" + i + "?o" + (i + 1);
 			selectPart += " ?p" + i + "?o" + (i + 1);
 		}
+		
+		for (int i = 1; i < depth; i++) {
+			mainPart += "}";
+		}
+		
 		query = selectPart + " WHERE " + mainPart + "} LIMIT " + numberWalks;
 		return query;
 	}
@@ -254,7 +259,7 @@ public class WalkGenerator {
 //		wg.setPrefixMap(prefixes);
 //
 //		wg.generateWalks("/Users/lgu/Desktop/fn17", "/Users/lgu/Desktop/fn17_walks");
-		
+
 		System.out.println(QueryFactory.create(generateQueryNoPredicates(8, 200)).toString(Syntax.syntaxSPARQL_11));
 
 	}
