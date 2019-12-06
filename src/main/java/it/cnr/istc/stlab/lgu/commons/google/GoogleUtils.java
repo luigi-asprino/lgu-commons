@@ -22,6 +22,8 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.SheetsScopes;
 
+import it.cnr.istc.stlab.lgu.commons.files.FileUtils;
+
 public class GoogleUtils {
 
 	private static Logger logger = LoggerFactory.getLogger(GoogleUtils.class);
@@ -47,6 +49,7 @@ public class GoogleUtils {
 
 		logger.info("Getting credentials");
 		logger.trace("Credentional file exists? {}", new File(CREDENTIALS_FILE_PATH).exists());
+		logger.trace("FILE CREDENTIALS : {}", FileUtils.readFile(CREDENTIALS_FILE_PATH));
 
 		// Load client secrets.
 		InputStream in = new FileInputStream(new File(CREDENTIALS_FILE_PATH));

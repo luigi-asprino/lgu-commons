@@ -40,14 +40,16 @@ public class WalkGenerator {
 	private static Logger logger = LoggerFactory.getLogger(WalkGenerator.class);
 
 	private int depth = 8, numWalksPerEntity = 200;
+	private boolean excludeLiteralsFromPath = false;
+	private boolean createAVirtualDocumentForEachEntity = false;
 	private String separator = " ", entitySelectorQuery = defaultEntitySelectorQuery;
 	private static final String defaultEntitySelectorQuery = "SELECT DISTINCT ?entity WHERE {?entity ?p _:o}";
 	private static final String STRING_TOKENIZER_DELIMITERS = ".;,:?!'`\\/";
-	private QueryWalks queryWalks = QueryWalks.RDF2Vec;
+	private List<QueryWalks> queryWalks = new ArrayList<>();
 	private Map<String, String> prefixMap = new HashMap<String, String>();
 
 	public enum QueryWalks {
-		RDF2Vec, RDF2Vec_NO_PREDICATES
+		RDF2Vec, RDF2Vec_NO_PREDICATES, RDF2Vec_INGOING
 	}
 
 	public void generateWalks(String tdbFilePath, String fileOut) throws IOException {
@@ -57,41 +59,81 @@ public class WalkGenerator {
 
 	public void generateWalks(Dataset d, String fileOut) throws IOException {
 
-		String query;
+		List<String> queries = new ArrayList<>();
 
-		switch (queryWalks) {
-		case RDF2Vec:
-		default:
-			query = generateQueryRDF2Vec(depth, numWalksPerEntity);
-			break;
-		case RDF2Vec_NO_PREDICATES:
-			query = generateQueryNoPredicates(depth, numWalksPerEntity);
-			break;
+		for (QueryWalks q : queryWalks) {
+			switch (q) {
+			case RDF2Vec:
+				queries.add(generateQueryRDF2Vec(depth, numWalksPerEntity));
+				break;
+			case RDF2Vec_NO_PREDICATES:
+				queries.add(generateQueryNoPredicates(depth, numWalksPerEntity));
+				break;
+			case RDF2Vec_INGOING:
+				queries.add(generateQueryRDF2VecIngoing(depth, numWalksPerEntity));
+				break;
+			}
 		}
 
-		ParameterizedSparqlString pss = new ParameterizedSparqlString(query);
+		if (queries.isEmpty()) {
+			queries.add(generateQueryRDF2Vec(depth, numWalksPerEntity));
+		}
+
+		logger.info("Queries for walks\n\n");
+		for (String q : queries) {
+			logger.info("\n\n{}\n\n",QueryFactory.create(q).toString(Syntax.syntaxSPARQL_11));
+			logger.info("\n\n");
+		}
+
 		FileOutputStream fos = new FileOutputStream(new File(fileOut));
 		Set<String> entities = selectEntities(d, entitySelectorQuery);
 
 		logger.info("Number of entities {}", entities.size());
-		int entitiesProcessed = 0;
-		ProgressCounter pc = new ProgressCounter(entitiesProcessed);
-
+		ProgressCounter pc = new ProgressCounter(entities.size());
 		for (String e : entities) {
-			pss.setIri("entity", e);
-			executeQuery(d, pss.toString(), e, separator, prefixMap).forEach(s -> {
-				try {
-					fos.write(s.getBytes());
-					fos.write('\n');
-					fos.flush();
-				} catch (IOException e1) {
-					e1.printStackTrace();
+			if (!createAVirtualDocumentForEachEntity) {
+				for (String query : queries) {
+					ParameterizedSparqlString pss = new ParameterizedSparqlString(query);
+					pss.setIri("entity", e);
+					// FORMAT <walk1_entity1>\n<walk2_entity2>\n...\n<walk_entityN>
+					executeQuery(d, pss.toString(), e, separator, prefixMap, excludeLiteralsFromPath).forEach(s -> {
+						try {
+							fos.write(s.getBytes());
+							fos.write('\n');
+							fos.flush();
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
+					});
 				}
-			});
+			} else {
+				// FORMAT URI entity\t<walk1> <walk2>...<walkN>
+				fos.write(e.getBytes());
+				fos.write(' ');
+				fos.write('#');
+				fos.write('#');
+				fos.write('\t');
+
+				for (String query : queries) {
+					ParameterizedSparqlString pss = new ParameterizedSparqlString(query);
+					pss.setIri("entity", e);
+
+					executeQuery(d, pss.toString(), e, separator, prefixMap, excludeLiteralsFromPath).forEach(s -> {
+						try {
+							fos.write(s.getBytes());
+							fos.write(' ');
+							fos.flush();
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
+					});
+					fos.write(' ');
+				}
+				fos.write('\n');
+			}
 			pc.increase();
 		}
 		fos.close();
-
 	}
 
 	private static Set<String> selectEntities(Dataset d, String baseQuery) {
@@ -112,7 +154,7 @@ public class WalkGenerator {
 	}
 
 	private static List<String> executeQuery(Dataset d, String queryStr, String entity, String separator,
-			Map<String, String> prefixMap) {
+			Map<String, String> prefixMap, boolean excludeLiteralsFromPath) {
 		List<String> walkList = new ArrayList<>();
 		Query query = QueryFactory.create(queryStr);
 
@@ -127,7 +169,7 @@ public class WalkGenerator {
 			for (String var : results.getResultVars()) {
 				try {
 					// clean it if it is a literal
-					if (result.get(var) != null && result.get(var).isLiteral()) {
+					if (result.get(var) != null && result.get(var).isLiteral() && !excludeLiteralsFromPath) {
 						String val = result.getLiteral(var).getValue().toString();
 						val = val.replace("\n", " ").replace("\t", " ").replace(separator, " ");
 						StringTokenizer st = new StringTokenizer(val, STRING_TOKENIZER_DELIMITERS);
@@ -135,6 +177,9 @@ public class WalkGenerator {
 							singleWalk += st.nextToken().toLowerCase() + separator;
 						}
 					} else if (result.get(var) != null) {
+						if (!result.get(var).isURIResource() && excludeLiteralsFromPath) {
+							continue;
+						}
 						singleWalk += shortenEntity(result.get(var).toString().replace(separator, ""), prefixMap)
 								+ separator;
 					}
@@ -163,16 +208,34 @@ public class WalkGenerator {
 		String selectPart = "SELECT ?p ?o1";
 		String mainPart = "{ ?entity ?p ?o1  ";
 		String query = "";
-		
+
 		for (int i = 1; i < depth; i++) {
 			mainPart += ". OPTIONAL {?o" + i + " ?p" + i + "?o" + (i + 1);
 			selectPart += " ?p" + i + "?o" + (i + 1);
 		}
-		
+
 		for (int i = 1; i < depth; i++) {
 			mainPart += "}";
 		}
-		
+
+		query = selectPart + " WHERE " + mainPart + "} LIMIT " + numberWalks;
+		return query;
+	}
+
+	private static String generateQueryRDF2VecIngoing(int depth, int numberWalks) {
+		String selectPart = "SELECT ?p ?o1";
+		String mainPart = "{ ?o1 ?p ?entity  ";
+		String query = "";
+
+		for (int i = 1; i < depth; i++) {
+			mainPart += ". OPTIONAL {?o" + (i + 1) + " ?p" + i + "?o" + (i);
+			selectPart += " ?p" + i + "?o" + (i + 1);
+		}
+
+		for (int i = 1; i < depth; i++) {
+			mainPart += "}";
+		}
+
 		query = selectPart + " WHERE " + mainPart + "} LIMIT " + numberWalks;
 		return query;
 	}
@@ -227,12 +290,11 @@ public class WalkGenerator {
 		this.entitySelectorQuery = entitySelectorQuery;
 	}
 
-	public QueryWalks getQueryWalks() {
-		return queryWalks;
-	}
-
-	public void setQueryWalks(QueryWalks queryWalks) {
-		this.queryWalks = queryWalks;
+	public void setQueryWalks(QueryWalks... queryWalks) {
+		this.queryWalks = new ArrayList<>();
+		for (QueryWalks q : queryWalks) {
+			this.queryWalks.add(q);
+		}
 	}
 
 	public Map<String, String> getPrefixMap() {
@@ -243,25 +305,41 @@ public class WalkGenerator {
 		this.prefixMap = prefixMap;
 	}
 
-	public static void main(String[] args) throws IOException {
-//		WalkGenerator wg = new WalkGenerator();
-//		wg.setQueryWalks(QueryWalks.RDF2Vec_NO_PREDICATES);
-//
-//		Map<String, String> prefixes = new HashMap<>();
-//		prefixes.put("fnschema", "https://w3id.org/framester/framenet/tbox/");
-//		prefixes.put("owl", "http://www.w3.org/2002/07/owl#");
-//		prefixes.put("lu", "https://w3id.org/framester/framenet/abox/lu/");
-//		prefixes.put("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
-//		prefixes.put("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-//		prefixes.put("frame", "https://w3id.org/framester/framenet/abox/frame/");
-//		prefixes.put("fe", "https://w3id.org/framester/framenet/abox/fe/");
-//
-//		wg.setPrefixMap(prefixes);
-//
-//		wg.generateWalks("/Users/lgu/Desktop/fn17", "/Users/lgu/Desktop/fn17_walks");
-
-		System.out.println(QueryFactory.create(generateQueryNoPredicates(8, 200)).toString(Syntax.syntaxSPARQL_11));
-
+	public boolean isExcludeLiteralsFromPath() {
+		return excludeLiteralsFromPath;
 	}
+
+	public void setExcludeLiteralsFromPath(boolean excludeLiteralsFromPath) {
+		this.excludeLiteralsFromPath = excludeLiteralsFromPath;
+	}
+
+	public boolean isCreateAVirtualDocumentForEachEntity() {
+		return createAVirtualDocumentForEachEntity;
+	}
+
+	public void setCreateAVirtualDocumentForEachEntity(boolean createAVirtualDocumentForEachEntity) {
+		this.createAVirtualDocumentForEachEntity = createAVirtualDocumentForEachEntity;
+	}
+
+//	public static void main(String[] args) throws IOException {
+////		WalkGenerator wg = new WalkGenerator();
+////		wg.setQueryWalks(QueryWalks.RDF2Vec_NO_PREDICATES);
+////
+////		Map<String, String> prefixes = new HashMap<>();
+////		prefixes.put("fnschema", "https://w3id.org/framester/framenet/tbox/");
+////		prefixes.put("owl", "http://www.w3.org/2002/07/owl#");
+////		prefixes.put("lu", "https://w3id.org/framester/framenet/abox/lu/");
+////		prefixes.put("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
+////		prefixes.put("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
+////		prefixes.put("frame", "https://w3id.org/framester/framenet/abox/frame/");
+////		prefixes.put("fe", "https://w3id.org/framester/framenet/abox/fe/");
+////
+////		wg.setPrefixMap(prefixes);
+////
+////		wg.generateWalks("/Users/lgu/Desktop/fn17", "/Users/lgu/Desktop/fn17_walks");
+//
+//		System.out.println(QueryFactory.create(generateQueryRDF2VecIngoing(2, 200)).toString(Syntax.syntaxSPARQL_11));
+//
+//	}
 
 }

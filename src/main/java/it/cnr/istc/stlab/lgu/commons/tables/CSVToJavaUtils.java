@@ -93,10 +93,10 @@ public class CSVToJavaUtils {
 
 	}
 
-	public static void toCSVFile(String fileCSVPath, List<String[]> rows, char separator, boolean sep) {
+	public static void toCSVFile(String fileCSVPath, List<String[]> rows, char separator, boolean quote) {
 
 		try {
-			if (!sep) {
+			if (!quote) {
 				CSVWriter csvw = new CSVWriter(new FileWriter(new File(fileCSVPath)), separator,
 						CSVWriter.NO_QUOTE_CHARACTER);
 				csvw.writeAll(rows);

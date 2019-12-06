@@ -122,7 +122,7 @@
 	<properties>
 		<apachecommonscsv.version>1.5</apachecommonscsv.version>
 		<apachecommonsconfiguration.version>2.1.1</apachecommonsconfiguration.version>
-		<apachejena.version>3.11.0</apachejena.version>
+		<apachejena.version>3.13.0</apachejena.version>
 		<apachepoi.version>3.14</apachepoi.version>
 		<commonsbeanutils.version>1.9.3</commonsbeanutils.version>
 		<commonsio.version>2.6</commonsio.version>

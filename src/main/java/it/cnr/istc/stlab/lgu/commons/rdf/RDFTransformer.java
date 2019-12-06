@@ -12,7 +12,7 @@ import org.apache.jena.tdb.TDBFactory;
 public class RDFTransformer {
 
 	public enum Format {
-		TTL, TDB
+		TTL, TDB, NT
 	}
 
 	private Format in, out;
