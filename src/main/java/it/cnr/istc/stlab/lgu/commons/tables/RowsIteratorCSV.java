@@ -3,6 +3,7 @@ package it.cnr.istc.stlab.lgu.commons.tables;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -15,6 +16,12 @@ public class RowsIteratorCSV implements RowsIterator {
 	public RowsIteratorCSV(String file, char separator) throws FileNotFoundException {
 		super();
 		this.reader = new CSVReader(new FileReader(file), separator);
+	}
+	
+	
+	public RowsIteratorCSV(Reader reader, char separator) throws FileNotFoundException {
+		super();
+		this.reader = new CSVReader(reader, separator);
 	}
 
 	@Override
@@ -50,15 +57,13 @@ public class RowsIteratorCSV implements RowsIterator {
 	@Override
 	public boolean hasNext() {
 		try {
-
 			if (nextRow == null && !readNextCalled) {
-				if (readNextCalled) {
-					return false;
-				} else {
-					nextRow = reader.readNext();
-					readNextCalled = true;
-					return nextRow != null;
-				}
+				// FIRST LINE
+				nextRow = reader.readNext();
+				readNextCalled = true;
+				return nextRow != null;
+			} else if (nextRow == null && readNextCalled) {
+				return false;
 			} else {
 				return true;
 			}

@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,17 @@ public class FileUtils {
 		} catch (IOException e) {
 
 		}
+		return n;
+	}
+
+	public static long countNumberOfLines(Reader reader) throws IOException {
+		long n = 0;
+		BufferedReader br = new BufferedReader(reader);
+		while (br.readLine() != null) {
+			n++;
+		}
+//		System.out.println("Number of lines of " + filename + " : " + n);
+		br.close();
 		return n;
 	}
 
