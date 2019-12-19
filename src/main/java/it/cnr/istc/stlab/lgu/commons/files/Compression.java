@@ -1,31 +1,39 @@
 package it.cnr.istc.stlab.lgu.commons.files;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.zip.GZIPInputStream;
+
+import org.apache.commons.compress.compressors.CompressorException;
 
 public class Compression {
-	
-	public static void printFirstLinesOfGZipFile(String file, int numberOfLines) throws IOException {
-		InputStream fileStream = new FileInputStream(file);
-		InputStream gzipStream = new GZIPInputStream(fileStream);
-		Reader decoder = new InputStreamReader(gzipStream);
+
+	public static void printFirstLinesOfGZipFile(String file, int numberOfLines)
+			throws IOException, CompressorException {
+		Reader decoder = new InputStreamReader(InputStreamFactory.getInputStream(file));
 		BufferedReader buffered = new BufferedReader(decoder);
-		
-		for(int i=0;i<numberOfLines;i++) {
-			System.out.println(buffered.readLine());
-		}
+		readFirstLinesOfBufferedReader(buffered, numberOfLines);
 		buffered.close();
 	}
-	
-	public static void main(String[] args) throws IOException {
-		printFirstLinesOfGZipFile("/Users/lgu/Dropbox/Lavoro/Projects/Framester/f/Framester_v3/endpoint_v3/conceptnet/5.7.0/conceptnet-assertion-5.7.0.nq.gz", 100);
+
+	public static void printFirstLinesOfBZ2File(String file, int numberOfLines)
+			throws IOException, CompressorException {
+		BufferedReader br2 = new BufferedReader(new InputStreamReader(InputStreamFactory.getInputStream(file)));
+		readFirstLinesOfBufferedReader(br2, numberOfLines);
+		br2.close();
 	}
-	
-	
+
+	public static void readFirstLinesOfBufferedReader(BufferedReader br, int numberOfLines) throws IOException {
+		for (int i = 0; i < numberOfLines; i++) {
+			System.out.println(br.readLine());
+		}
+	}
+
+	public static void main(String[] args) throws IOException, CompressorException {
+		String f = "/Users/lgu/Desktop/csk_repo/interlanguage-links_lang=pnb.ttl.bz2";
+		printFirstLinesOfBZ2File(f, 100);
+
+	}
 
 }
