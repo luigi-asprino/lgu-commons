@@ -21,10 +21,12 @@ public class File extends java.io.File {
 	private Format format;
 	private CompressionFormat compressionFormat;
 
-	private enum Format {
+	public enum Format {
+		TTL, NT
 	}
 
-	private enum CompressionFormat {
+	public enum CompressionFormat {
+		GZ, BZ2
 	}
 
 	public String getFilepath() {

@@ -1,7 +1,9 @@
 package it.cnr.istc.stlab.lgu.commons.rdf;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -23,6 +25,8 @@ public class Dataset {
 	private static Dataset instance;
 	private List<HDT> hdts = new ArrayList<>();
 	private List<String> files = new ArrayList<>();
+	private static final String[] COMPRESSION_EXTENSIONS = { "gz", "bz2" };
+	private static final String[] EXTENSIONS = { "nt", "ttl" };
 
 	private Dataset(List<String> files, List<HDT> hdts) throws IOException {
 		this.hdts = hdts;
@@ -33,17 +37,34 @@ public class Dataset {
 		if (instance != null) {
 			return instance;
 		}
-		String[] files = filelist.split(",");
+
 		List<HDT> hdts = new ArrayList<>();
 		List<String> plainfiles = new ArrayList<>();
-		for (String f : files) {
+		List<String> filesToProcess = new ArrayList<>();
+
+		File folderfile = new File(filelist);
+		if (folderfile.isDirectory()) {
+			for (File f : folderfile.listFiles()) {
+				filesToProcess.add(f.getAbsolutePath());
+			}
+		} else {
+			filesToProcess.addAll(Arrays.asList(filelist.split(",")));
+		}
+
+		for (String f : filesToProcess) {
 			if (FilenameUtils.getExtension(f).equalsIgnoreCase("hdt")) {
 				logger.info("Mapping HDT {}", f);
 				HDT hdt = HDTManager.mapIndexedHDT(f, null);
 				hdts.add(hdt);
 				logger.info("HDT mapped");
 			} else {
-				plainfiles.add(f);
+				if (FilenameUtils.isExtension(f, COMPRESSION_EXTENSIONS)) {
+					if (FilenameUtils.isExtension(FilenameUtils.removeExtension(f), EXTENSIONS)) {
+						plainfiles.add(f);
+					}
+				} else if (FilenameUtils.isExtension(f, EXTENSIONS)) {
+					plainfiles.add(f);
+				}
 			}
 		}
 		instance = new Dataset(plainfiles, hdts);
@@ -64,13 +85,23 @@ public class Dataset {
 
 	public long estimateSearch(CharSequence s, CharSequence p, CharSequence o)
 			throws NotFoundException, CompressorException, IOException {
+		logger.trace("\"{}\" \"{}\" \"{}\"", s, p, o);
 		long result = 0;
+		logger.trace("Estimating results on HDTs");
+		int c = 0;
 		for (HDT hdt : hdts) {
 			result += hdt.search(s, p, o).estimatedNumResults();
+			logger.trace("{}/{} files processed.", c, hdts.size());
+			c++;
 		}
 
+		logger.trace("Estimating results on files");
+		c = 0;
 		for (String f : files) {
+			logger.trace("Processing file {}/{} {}", c, files.size(), f);
 			result += StreamRDFUtils.estimateSearchResults(f, s, p, o);
+			logger.trace("{}/{} files processed.", c, files.size());
+			c++;
 		}
 
 		return result;

@@ -3,12 +3,17 @@ package it.cnr.istc.stlab.lgu.commons.rdf;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.riot.RDFDataMgr;
+import org.apache.log4j.lf5.util.StreamUtils;
+import org.rdfhdt.hdt.hdt.HDTManager;
+import org.rdfhdt.hdt.options.HDTSpecification;
+import org.rdfhdt.hdt.rdf.TripleWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +51,38 @@ public class RDFMergeUtils {
 		}
 		logger.info("Model size {}", m.size());
 		return m;
+	}
+
+	public static void mergeAsHDT(List<String> files, String fileOut, String base) {
+
+		try {
+
+			int filenum = 0, triples = 0;
+			TripleWriter writer = HDTManager.getHDTWriter(fileOut, base, new HDTSpecification());
+			for (String file : files) {
+
+				logger.trace("Getting writer");
+
+				logger.trace("{}/{} - Creating iterator for {}", filenum++, files.size(), file);
+				IteratorTripleStringWrapper itsw = StreamRDFUtils.createIteratorTripleStringWrapperFromFile(file);
+				while (itsw.hasNext()) {
+					writer.addTriple(itsw.next());
+					triples++;
+				}
+
+			}
+			logger.info("Triples {}", triples);
+			writer.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+	
+	public static void mergeAsNTBZ2(List<String> filesToMerge, String fileOut) {
+		
+//		TODO
+//		StreamRDFUtils.createIteratorTripleFromFile(filename)
 	}
 
 }

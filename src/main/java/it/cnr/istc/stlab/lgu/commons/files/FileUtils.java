@@ -12,7 +12,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import org.apache.commons.io.FilenameUtils;
+
 public class FileUtils {
+
+	public static List<String> filterFilesUnderTreeRec(String folder, String[] extensions) {
+		List<String> result = new ArrayList<>();
+		getFilesUnderTreeRec(folder).forEach(f -> {
+			if (FilenameUtils.isExtension(f, extensions)) {
+				result.add(f);
+			}
+		});
+		return result;
+	}
+
+	public static List<String> filterFilesInFolder(String folder, String[] extensions) {
+		List<String> result = new ArrayList<>();
+		for (File f : new File(folder).listFiles()) {
+			if (FilenameUtils.isExtension(f.getAbsolutePath(), extensions)) {
+				result.add(f.getAbsolutePath());
+			}
+		}
+		return result;
+	}
 
 	public static List<String> getFilesUnderTreeRec(String filePath) {
 		List<String> result = new ArrayList<String>();
