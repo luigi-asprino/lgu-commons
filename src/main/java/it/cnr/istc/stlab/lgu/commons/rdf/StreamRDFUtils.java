@@ -3,6 +3,7 @@ package it.cnr.istc.stlab.lgu.commons.rdf;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -91,6 +92,8 @@ public class StreamRDFUtils {
 		return r;
 
 	}
+	
+	
 
 	public static void cleanFile(String fileIn, String fielOut, CompressionFormat cfOutFormat, RDFFormat ff)
 			throws CompressorException, IOException {

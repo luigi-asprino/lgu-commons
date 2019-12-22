@@ -80,6 +80,7 @@ public class RDFMergeUtils {
 	
 	public static void mergeAsNTBZ2(List<String> filesToMerge, String fileOut) {
 		
+		
 //		TODO
 //		StreamRDFUtils.createIteratorTripleFromFile(filename)
 	}
