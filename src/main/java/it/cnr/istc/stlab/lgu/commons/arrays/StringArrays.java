@@ -1,12 +1,7 @@
 package it.cnr.istc.stlab.lgu.commons.arrays;
 
 public class StringArrays {
-	/**
-	 * It transforms the arrary passed as parameter in a string.
-	 * 
-	 * @param a
-	 * @return
-	 */
+
 	public static String toString(String[] a) {
 
 		StringBuilder sb = new StringBuilder();
