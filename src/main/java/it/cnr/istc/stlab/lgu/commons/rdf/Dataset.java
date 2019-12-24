@@ -6,11 +6,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Stream;
 
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.jena.graph.Triple;
 import org.rdfhdt.hdt.exceptions.NotFoundException;
 import org.rdfhdt.hdt.hdt.HDT;
 import org.rdfhdt.hdt.hdt.HDTManager;
