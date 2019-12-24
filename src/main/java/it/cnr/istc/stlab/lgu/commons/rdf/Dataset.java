@@ -3,7 +3,6 @@ package it.cnr.istc.stlab.lgu.commons.rdf;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -56,7 +55,7 @@ public class Dataset {
 		}
 	}
 
-	public static Dataset getInstanceFromFileList(String filelist) throws IOException {
+	public static Dataset getInstanceFromFileList(String[] files) throws IOException {
 		if (instance != null) {
 			return instance;
 		}
@@ -65,13 +64,15 @@ public class Dataset {
 		List<String> plainfiles = new ArrayList<>();
 		List<String> filesToProcess = new ArrayList<>();
 
-		File folderfile = new File(filelist);
-		if (folderfile.isDirectory()) {
-			for (File f : folderfile.listFiles()) {
-				filesToProcess.add(f.getAbsolutePath());
+		for (String filename : files) {
+			File file = new File(filename);
+			if (file.isDirectory()) {
+				for (File f : file.listFiles()) {
+					filesToProcess.add(f.getAbsolutePath());
+				}
+			} else {
+				filesToProcess.add(filename);
 			}
-		} else {
-			filesToProcess.addAll(Arrays.asList(filelist.split(",")));
 		}
 
 		for (String f : filesToProcess) {
