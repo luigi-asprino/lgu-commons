@@ -5,6 +5,12 @@ public class ProgressCounter {
 	private long progress;
 	private long steps = 10;
 	private long check;
+	private boolean absolute = false;
+
+	public ProgressCounter() {
+		check = 10000;
+		absolute = true;
+	}
 
 	public ProgressCounter(long until) {
 		check = until / steps;
@@ -13,11 +19,15 @@ public class ProgressCounter {
 	public void increase() {
 		progress++;
 		if (progress % check == 0) {
-			long perc = (progress / check) * steps;
-			if (perc == 100) {
-				System.out.println(perc + "%");
+			if (!absolute) {
+				long perc = (progress / check) * steps;
+				if (perc == 100) {
+					System.out.println(perc + "%");
+				} else {
+					System.out.print(perc + "% ");
+				}
 			} else {
-				System.out.print(perc + "% ");
+				System.out.println(progress + " ");
 			}
 		}
 	}

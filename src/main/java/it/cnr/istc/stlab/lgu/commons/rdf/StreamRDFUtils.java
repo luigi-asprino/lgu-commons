@@ -3,7 +3,6 @@ package it.cnr.istc.stlab.lgu.commons.rdf;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,6 +20,7 @@ import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.riot.system.StreamRDF;
 import org.apache.jena.riot.system.StreamRDFWriter;
+import org.apache.jena.sparql.core.Quad;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.rdfhdt.hdt.triples.IteratorTripleString;
 import org.rdfhdt.hdt.triples.TripleString;
@@ -43,11 +43,22 @@ public class StreamRDFUtils {
 		return RDFDataMgr.createIteratorTriples(is, RDFLanguages.filenameToLang(filename), "");
 	}
 
+	public static Iterator<Quad> createIteratorQuadsFromFile(String filename) throws CompressorException, IOException {
+		InputStream is = InputStreamFactory.getInputStream(filename);
+		return RDFDataMgr.createIteratorQuads(is, RDFLanguages.filenameToLang(filename), "");
+	}
+
 	public static IteratorTripleStringWrapper createIteratorTripleStringWrapperFromFile(String filename)
 			throws CompressorException, IOException {
 		InputStream is = InputStreamFactory.getInputStream(filename);
 		Iterator<Triple> it = RDFDataMgr.createIteratorTriples(is, RDFLanguages.filenameToLang(filename), "");
 		return new IteratorTripleStringWrapper(it);
+	}
+
+	public static IteratorTripleStringWrapper createIteratorTripleStringWrapperFromQuadsFile(String filename)
+			throws CompressorException, IOException {
+		return new IteratorTripleStringWrapper(
+				new IteratorTripleFromQuads(StreamRDFUtils.createIteratorQuadsFromFile(filename)));
 	}
 
 	public static Iterator<Triple> filterByPredicate(Iterator<Triple> it, String predicate) {
@@ -81,6 +92,14 @@ public class StreamRDFUtils {
 
 	}
 
+	public static Iterator<TripleString> createFilteredIteratorTripleStringFromQuadsFile(String f, CharSequence s,
+			CharSequence p, CharSequence o) throws CompressorException, IOException {
+
+		IteratorTripleStringWrapper itsw = createIteratorTripleStringWrapperFromQuadsFile(f);
+		return filter(itsw, s, p, o);
+
+	}
+
 	public static long estimateSearchResults(String f, CharSequence s, CharSequence p, CharSequence o)
 			throws CompressorException, IOException {
 		long r = 0;
@@ -92,8 +111,6 @@ public class StreamRDFUtils {
 		return r;
 
 	}
-	
-	
 
 	public static void cleanFile(String fileIn, String fielOut, CompressionFormat cfOutFormat, RDFFormat ff)
 			throws CompressorException, IOException {

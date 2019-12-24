@@ -6,9 +6,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.jena.graph.Triple;
 import org.rdfhdt.hdt.exceptions.NotFoundException;
 import org.rdfhdt.hdt.hdt.HDT;
 import org.rdfhdt.hdt.hdt.HDTManager;
@@ -24,13 +26,36 @@ public class Dataset {
 
 	private static Dataset instance;
 	private List<HDT> hdts = new ArrayList<>();
-	private List<String> files = new ArrayList<>();
+	private List<String> tripleFiles = new ArrayList<>();
+	private List<String> quadsFiles = new ArrayList<>();
 	private static final String[] COMPRESSION_EXTENSIONS = { "gz", "bz2" };
-	private static final String[] EXTENSIONS = { "nt", "ttl" };
+	private static final String[] EXTENSIONS = { "nt", "ttl", "nq" };
+	private static final String[] TRIPLE_EXTENSIONS = { "nt", "ttl" };
+	private static final String[] QUADS_EXTENSIONS = { "nq" };
 
 	private Dataset(List<String> files, List<HDT> hdts) throws IOException {
 		this.hdts = hdts;
-		this.files = files;
+		for (String f : files) {
+
+			if (FilenameUtils.isExtension(f, COMPRESSION_EXTENSIONS)) {
+				if (FilenameUtils.isExtension(FilenameUtils.removeExtension(f), TRIPLE_EXTENSIONS)) {
+					tripleFiles.add(f);
+				}
+
+				if (FilenameUtils.isExtension(FilenameUtils.removeExtension(f), QUADS_EXTENSIONS)) {
+					quadsFiles.add(f);
+				}
+			} else {
+				if (FilenameUtils.isExtension(f, TRIPLE_EXTENSIONS)) {
+					tripleFiles.add(f);
+				}
+
+				if (FilenameUtils.isExtension(f, QUADS_EXTENSIONS)) {
+					quadsFiles.add(f);
+				}
+			}
+
+		}
 	}
 
 	public static Dataset getInstanceFromFileList(String filelist) throws IOException {
@@ -77,9 +102,13 @@ public class Dataset {
 		for (HDT hdt : hdts) {
 			listOfIterators.add(hdt.search(s, p, o));
 		}
-		for (String f : files) {
+		for (String f : tripleFiles) {
 			listOfIterators.add(StreamRDFUtils.createFilteredIteratorTripleStringFromFile(f, s, p, o));
 		}
+		for (String f : quadsFiles) {
+			listOfIterators.add(StreamRDFUtils.createFilteredIteratorTripleStringFromQuadsFile(f, s, p, o));
+		}
+
 		return Iterators.concat(listOfIterators.iterator());
 	}
 
@@ -97,10 +126,10 @@ public class Dataset {
 
 		logger.trace("Estimating results on files");
 		c = 0;
-		for (String f : files) {
-			logger.trace("Processing file {}/{} {}", c, files.size(), f);
+		for (String f : tripleFiles) {
+			logger.trace("Processing file {}/{} {}", c, tripleFiles.size(), f);
 			result += StreamRDFUtils.estimateSearchResults(f, s, p, o);
-			logger.trace("{}/{} files processed.", c, files.size());
+			logger.trace("{}/{} files processed.", c, tripleFiles.size());
 			c++;
 		}
 
@@ -112,7 +141,10 @@ public class Dataset {
 	}
 
 	public List<String> getFiles() {
-		return files;
+		List<String> result = new ArrayList<>();
+		result.addAll(tripleFiles);
+		result.addAll(quadsFiles);
+		return result;
 	}
 
 }

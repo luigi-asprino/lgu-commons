@@ -20,7 +20,7 @@ import it.cnr.istc.stlab.lgu.commons.files.FileUtils;
 
 public class RDFMergeUtils {
 
-	private static final String[] EXTENSIONS = new String[] { "xml", "rdf", "ttl", "nt" };
+	private static final String[] EXTENSIONS = new String[] { "xml", "rdf", "ttl", "nt", "owl" };
 	private static Logger logger = LoggerFactory.getLogger(RDFMergeUtils.class);
 
 	public static void mergeFolders(Map<String, String> nsPrefixes, String[] folderPath, String fileOut, String lang)
@@ -77,10 +77,9 @@ public class RDFMergeUtils {
 		}
 
 	}
-	
+
 	public static void mergeAsNTBZ2(List<String> filesToMerge, String fileOut) {
-		
-		
+
 //		TODO
 //		StreamRDFUtils.createIteratorTripleFromFile(filename)
 	}
