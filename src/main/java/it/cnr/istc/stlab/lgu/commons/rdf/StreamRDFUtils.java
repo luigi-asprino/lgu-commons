@@ -54,8 +54,17 @@ public class StreamRDFUtils {
 	public static IteratorTripleStringWrapper createIteratorTripleStringWrapperFromFile(String filename)
 			throws CompressorException, IOException {
 		InputStream is = InputStreamFactory.getInputStream(filename);
-		Iterator<Triple> it = RDFDataMgr.createIteratorTriples(is, RDFLanguages.filenameToLang(filename), "");
-		return new IteratorTripleStringWrapper(it);
+		it.cnr.istc.stlab.lgu.commons.files.File f = new it.cnr.istc.stlab.lgu.commons.files.File(filename);
+		switch (f.getFormat()) {
+		case NQ:
+			return createIteratorTripleStringWrapperFromQuadsFile(filename);
+		case NT:
+		case TTL:
+		default:
+			return new IteratorTripleStringWrapper(
+					RDFDataMgr.createIteratorTriples(is, RDFLanguages.filenameToLang(filename), ""));
+		}
+
 	}
 
 	public static IteratorTripleStringWrapper createIteratorTripleStringWrapperFromQuadsFile(String filename)
@@ -161,7 +170,7 @@ public class StreamRDFUtils {
 	public static Stream<TripleString> createTripleStringStream(String file) throws CompressorException, IOException {
 		Stream<String> lineStream = InputStreamFactory.getInputLineStream(file);
 		return lineStream.map(lineString -> {
-			
+
 			TripleString ts = new TripleString();
 			try {
 				ts.read(lineString);

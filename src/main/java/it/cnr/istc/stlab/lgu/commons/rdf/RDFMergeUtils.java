@@ -64,6 +64,9 @@ public class RDFMergeUtils {
 
 
 				logger.info("{}/{} - Creating iterator for {}", filenum++, files.size(), file);
+				
+				
+				
 				IteratorTripleStringWrapper itsw = StreamRDFUtils.createIteratorTripleStringWrapperFromFile(file);
 				while (itsw.hasNext()) {
 					writer.addTriple(itsw.next());
