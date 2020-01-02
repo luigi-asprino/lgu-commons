@@ -53,6 +53,7 @@ public class RDFMergeUtils {
 	}
 
 	public static void mergeAsHDT(List<String> files, String fileOut, String base) {
+		System.out.println("merging");
 
 		try {
 
