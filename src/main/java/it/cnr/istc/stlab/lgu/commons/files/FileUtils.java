@@ -107,6 +107,7 @@ public class FileUtils {
 		return file.delete();
 	}
 
+	@Deprecated
 	public static void deleteFoler(String path) throws IOException {
 
 		System.out.println("Are you sure to delete " + path + "? [YES/NO]");
@@ -148,6 +149,7 @@ public class FileUtils {
 				// if file, then delete it
 				file.delete();
 			}
+
 		}
 	}
 

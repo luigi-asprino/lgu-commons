@@ -57,12 +57,12 @@ public class RDFMergeUtils {
 		try {
 
 			int filenum = 0, triples = 0;
+			logger.info("Getting HDT writer");
 			TripleWriter writer = HDTManager.getHDTWriter(fileOut, base, new HDTSpecification());
 			for (String file : files) {
 
-				logger.trace("Getting writer");
 
-				logger.trace("{}/{} - Creating iterator for {}", filenum++, files.size(), file);
+				logger.info("{}/{} - Creating iterator for {}", filenum++, files.size(), file);
 				IteratorTripleStringWrapper itsw = StreamRDFUtils.createIteratorTripleStringWrapperFromFile(file);
 				while (itsw.hasNext()) {
 					writer.addTriple(itsw.next());

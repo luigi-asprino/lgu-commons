@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.Iterator;
+import java.util.stream.Stream;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.compress.compressors.CompressorException;
@@ -18,10 +19,12 @@ import org.apache.jena.graph.Triple;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.RDFLanguages;
+import org.apache.jena.riot.lang.LangNTriples;
 import org.apache.jena.riot.system.StreamRDF;
 import org.apache.jena.riot.system.StreamRDFWriter;
 import org.apache.jena.sparql.core.Quad;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.rdfhdt.hdt.exceptions.ParserException;
 import org.rdfhdt.hdt.triples.IteratorTripleString;
 import org.rdfhdt.hdt.triples.TripleString;
 import org.slf4j.Logger;
@@ -145,6 +148,35 @@ public class StreamRDFUtils {
 		os.flush();
 		stream.finish();
 		os.close();
+	}
+
+	public static Stream<Triple> createStream(String file) throws CompressorException, IOException {
+		Stream<String> lineStream = InputStreamFactory.getInputLineStream(file);
+		return lineStream.map(lineString -> {
+			LangNTriples nTriplesParser = RDFParsers.getNTriplesParser(new ByteArrayInputStream(lineString.getBytes()));
+			return nTriplesParser.next();
+		});
+	}
+
+	public static Stream<TripleString> createTripleStringStream(String file) throws CompressorException, IOException {
+		Stream<String> lineStream = InputStreamFactory.getInputLineStream(file);
+		return lineStream.map(lineString -> {
+			
+			TripleString ts = new TripleString();
+			try {
+				ts.read(lineString);
+			} catch (ParserException e) {
+				e.printStackTrace();
+			}
+			return ts;
+		});
+	}
+
+	public static Stream<TripleString> createFilteredTripleStream(String f, CharSequence s, CharSequence p,
+			CharSequence o) throws CompressorException, IOException {
+		return createTripleStringStream(f).filter(t -> {
+			return t.match(new TripleString(s, p, o));
+		});
 	}
 
 }

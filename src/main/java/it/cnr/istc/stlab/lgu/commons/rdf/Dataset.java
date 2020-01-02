@@ -5,6 +5,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.io.FilenameUtils;
@@ -109,6 +113,25 @@ public class Dataset {
 		}
 
 		return Iterators.concat(listOfIterators.iterator());
+	}
+
+	public Stream<TripleString> searchStream(CharSequence s, CharSequence p, CharSequence o)
+			throws NotFoundException, CompressorException, IOException {
+
+		Stream<TripleString> r = Stream.empty();
+		for (HDT hdt : hdts) {
+			Iterator<TripleString> its = hdt.search(s, p, o);
+			Spliterator<TripleString> si = Spliterators.spliteratorUnknownSize(its, 0);
+			r = Stream.concat(r, StreamSupport.stream(si, true));
+		}
+
+		for (String f : tripleFiles) {
+			r = Stream.concat(r, StreamRDFUtils.createFilteredTripleStream(f, s, p, o));
+		}
+		for (String f : quadsFiles) {
+			r = Stream.concat(r, StreamSupport.stream(Spliterators.spliteratorUnknownSize(StreamRDFUtils.createFilteredIteratorTripleStringFromQuadsFile(f, s, p, o), 0), true));
+		}
+		return r;
 	}
 
 	public long estimateSearch(CharSequence s, CharSequence p, CharSequence o)
