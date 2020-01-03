@@ -93,6 +93,8 @@ public class RDFMergeUtils {
 
 	public static void mergeFiles(List<String> filesToMerge, String fileOut, Lang lang, CompressionFormat cf)
 			throws CompressorException, IOException {
+		
+		logger.info("Merging files");
 
 		OutputStream os;
 		switch (cf) {
