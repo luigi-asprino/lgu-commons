@@ -30,10 +30,4 @@ public class Compression {
 		}
 	}
 
-	public static void main(String[] args) throws IOException, CompressorException {
-		String f = "/Users/lgu/Desktop/csk_repo/interlanguage-links_lang=pnb.ttl.bz2";
-		printFirstLinesOfBZ2File(f, 100);
-
-	}
-
 }

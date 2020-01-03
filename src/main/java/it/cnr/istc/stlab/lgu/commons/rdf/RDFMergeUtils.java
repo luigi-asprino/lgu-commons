@@ -3,19 +3,30 @@ package it.cnr.istc.stlab.lgu.commons.rdf;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.GZIPOutputStream;
 
+import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.system.StreamRDF;
+import org.apache.jena.riot.system.StreamRDFWriter;
+import org.apache.jena.util.iterator.ClosableIterator;
 import org.rdfhdt.hdt.hdt.HDTManager;
 import org.rdfhdt.hdt.options.HDTSpecification;
 import org.rdfhdt.hdt.rdf.TripleWriter;
+import org.rdfhdt.hdt.triples.TripleString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import it.cnr.istc.stlab.lgu.commons.files.File.CompressionFormat;
 import it.cnr.istc.stlab.lgu.commons.files.FileUtils;
 
 public class RDFMergeUtils {
@@ -62,16 +73,14 @@ public class RDFMergeUtils {
 			TripleWriter writer = HDTManager.getHDTWriter(fileOut, base, new HDTSpecification());
 			for (String file : files) {
 
-
 				logger.info("{}/{} - Creating iterator for {}", filenum++, files.size(), file);
-				
-				
-				
-				IteratorTripleStringWrapper itsw = StreamRDFUtils.createIteratorTripleStringWrapperFromFile(file);
+
+				ClosableIterator<TripleString> itsw = StreamRDFUtils.createIteratorTripleStringWrapperFromFile(file);
 				while (itsw.hasNext()) {
 					writer.addTriple(itsw.next());
 					triples++;
 				}
+				itsw.close();
 
 			}
 			logger.info("Triples {}", triples);
@@ -82,10 +91,29 @@ public class RDFMergeUtils {
 
 	}
 
-	public static void mergeAsNTBZ2(List<String> filesToMerge, String fileOut) {
+	public static void mergeAsNTBZ2(List<String> filesToMerge, String fileOut, Lang lang, CompressionFormat cf)
+			throws CompressorException, IOException {
 
-//		TODO
-//		StreamRDFUtils.createIteratorTripleFromFile(filename)
+		OutputStream os;
+		switch (cf) {
+		case BZ2:
+			os = new CompressorStreamFactory().createCompressorOutputStream(CompressorStreamFactory.BZIP2,
+					new FileOutputStream(new File(fileOut)));
+			break;
+		case GZ:
+			os = new GZIPOutputStream(new FileOutputStream(new File(fileOut)));
+			break;
+		default:
+			os = new FileOutputStream(new File(fileOut));
+		}
+
+		StreamRDF stream = StreamRDFWriter.getWriterStream(os, lang);
+		for (String file : filesToMerge) {
+			RDFDataMgr.parse(stream, file);
+		}
+		os.flush();
+		stream.finish();
+		os.close();
 	}
 
 }

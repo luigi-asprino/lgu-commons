@@ -31,7 +31,7 @@ public class InputStreamFactory {
 
 	public static Stream<String> getInputLineStream(String file) throws CompressorException, IOException {
 		InputStream is = getInputStream(file);
-		BufferedReader br = new BufferedReader(new InputStreamReader(is),BUFFER_SIZE);
+		BufferedReader br = new BufferedReader(new InputStreamReader(is), BUFFER_SIZE);
 		Stream<String> result = br.lines().onClose(() -> {
 			try {
 				br.close();

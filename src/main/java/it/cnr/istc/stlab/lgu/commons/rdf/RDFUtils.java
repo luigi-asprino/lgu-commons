@@ -12,6 +12,8 @@ import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.DatasetGraphFactory;
 
+import it.cnr.istc.stlab.lgu.commons.files.File.Format;
+
 public class RDFUtils {
 
 	public static void writeModelOnNQuadsFile(Model m, String uri, String file) throws FileNotFoundException {
@@ -22,5 +24,10 @@ public class RDFUtils {
 		d.end();
 		d.close();
 		RDFDataMgr.write(new FileOutputStream(new File(file)), d, RDFFormat.NQ);
+	}
+
+	public static Format getFormat(String filename) {
+		it.cnr.istc.stlab.lgu.commons.files.File f = new it.cnr.istc.stlab.lgu.commons.files.File(filename);
+		return f.getFormat();
 	}
 }

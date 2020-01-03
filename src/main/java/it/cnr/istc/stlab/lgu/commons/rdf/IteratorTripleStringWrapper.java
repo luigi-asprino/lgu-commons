@@ -1,17 +1,19 @@
 package it.cnr.istc.stlab.lgu.commons.rdf;
 
-import java.util.Iterator;
+import java.io.InputStream;
 
 import org.apache.jena.graph.Triple;
 import org.rdfhdt.hdt.enums.ResultEstimationType;
 import org.rdfhdt.hdt.triples.IteratorTripleString;
 import org.rdfhdt.hdt.triples.TripleString;
 
-public class IteratorTripleStringWrapper implements IteratorTripleString {
+import it.cnr.istc.stlab.lgu.commons.iterations.ClosableIterator;
 
-	private Iterator<Triple> its;
+public class IteratorTripleStringWrapper implements IteratorTripleString, ClosableIterator<TripleString> {
 
-	public IteratorTripleStringWrapper(Iterator<Triple> its) {
+	private ClosableIterator<Triple> its;
+
+	public IteratorTripleStringWrapper(ClosableIterator<Triple> its) {
 		this.its = its;
 	}
 
@@ -40,7 +42,15 @@ public class IteratorTripleStringWrapper implements IteratorTripleString {
 	public ResultEstimationType numResultEstimation() {
 		throw new UnsupportedOperationException();
 	}
-	
-	
+
+	@Override
+	public void close() {
+		its.close();
+	}
+
+	@Override
+	public InputStream getInputStream() {
+		return its.getInputStream();
+	}
 
 }

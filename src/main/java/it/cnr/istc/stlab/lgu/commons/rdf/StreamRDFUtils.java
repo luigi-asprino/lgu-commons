@@ -25,7 +25,6 @@ import org.apache.jena.riot.system.StreamRDFWriter;
 import org.apache.jena.sparql.core.Quad;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.rdfhdt.hdt.exceptions.ParserException;
-import org.rdfhdt.hdt.triples.IteratorTripleString;
 import org.rdfhdt.hdt.triples.TripleString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,34 +34,39 @@ import com.google.common.collect.Iterators;
 
 import it.cnr.istc.stlab.lgu.commons.files.File.CompressionFormat;
 import it.cnr.istc.stlab.lgu.commons.files.InputStreamFactory;
+import it.cnr.istc.stlab.lgu.commons.iterations.ClosableIterator;
+import it.cnr.istc.stlab.lgu.commons.iterations.ClosableIteratorFromInputStream;
 
 public class StreamRDFUtils {
 
 	private static Logger logger = LoggerFactory.getLogger(StreamRDFUtils.class);
 
-	public static Iterator<Triple> createIteratorTripleFromFile(String filename)
+	public static ClosableIterator<Triple> createIteratorTripleFromFile(String filename)
 			throws CompressorException, IOException {
 		InputStream is = InputStreamFactory.getInputStream(filename);
-		return RDFDataMgr.createIteratorTriples(is, RDFLanguages.filenameToLang(filename), "");
+		return new ClosableIteratorFromInputStream<>(
+				RDFDataMgr.createIteratorTriples(is, RDFLanguages.filenameToLang(filename), ""), is);
 	}
 
-	public static Iterator<Quad> createIteratorQuadsFromFile(String filename) throws CompressorException, IOException {
+	public static ClosableIterator<Quad> createIteratorQuadsFromFile(String filename)
+			throws CompressorException, IOException {
 		InputStream is = InputStreamFactory.getInputStream(filename);
-		return RDFDataMgr.createIteratorQuads(is, RDFLanguages.filenameToLang(filename), "");
+		return new ClosableIteratorFromInputStream<>(
+				RDFDataMgr.createIteratorQuads(is, RDFLanguages.filenameToLang(filename), ""), is);
 	}
 
-	public static IteratorTripleStringWrapper createIteratorTripleStringWrapperFromFile(String filename)
+	public static ClosableIterator<TripleString> createIteratorTripleStringWrapperFromFile(String filename)
 			throws CompressorException, IOException {
 		InputStream is = InputStreamFactory.getInputStream(filename);
 		it.cnr.istc.stlab.lgu.commons.files.File f = new it.cnr.istc.stlab.lgu.commons.files.File(filename);
 		switch (f.getFormat()) {
 		case NQ:
-			return createIteratorTripleStringWrapperFromQuadsFile(filename);
+			return new ClosableIteratorFromInputStream<>(createIteratorTripleStringWrapperFromQuadsFile(filename), is);
 		case NT:
 		case TTL:
 		default:
-			return new IteratorTripleStringWrapper(
-					RDFDataMgr.createIteratorTriples(is, RDFLanguages.filenameToLang(filename), ""));
+			return new IteratorTripleStringWrapper(new ClosableIteratorFromInputStream<>(
+					RDFDataMgr.createIteratorTriples(is, RDFLanguages.filenameToLang(filename), ""), is));
 		}
 
 	}
@@ -83,29 +87,28 @@ public class StreamRDFUtils {
 		return it1;
 	}
 
-	public static Iterator<TripleString> filter(IteratorTripleString its, CharSequence s, CharSequence p,
-			CharSequence o) {
+	public static ClosableIterator<TripleString> filter(ClosableIterator<TripleString> its, CharSequence s,
+			CharSequence p, CharSequence o) {
 		Iterator<TripleString> r = Iterators.filter(its, new Predicate<TripleString>() {
-
 			@Override
 			public boolean apply(@Nullable TripleString ts) {
 				return ts.match(new TripleString(s, p, o));
 			}
 		});
 
-		return r;
+		return new ClosableIteratorFromInputStream<>(r, its.getInputStream());
 	}
 
-	public static Iterator<TripleString> createFilteredIteratorTripleStringFromFile(String f, CharSequence s,
+	public static ClosableIterator<TripleString> createFilteredIteratorTripleStringFromFile(String f, CharSequence s,
 			CharSequence p, CharSequence o) throws CompressorException, IOException {
 
-		IteratorTripleStringWrapper itsw = createIteratorTripleStringWrapperFromFile(f);
+		ClosableIterator<TripleString> itsw = createIteratorTripleStringWrapperFromFile(f);
 		return filter(itsw, s, p, o);
 
 	}
 
-	public static Iterator<TripleString> createFilteredIteratorTripleStringFromQuadsFile(String f, CharSequence s,
-			CharSequence p, CharSequence o) throws CompressorException, IOException {
+	public static ClosableIterator<TripleString> createFilteredIteratorTripleStringFromQuadsFile(String f,
+			CharSequence s, CharSequence p, CharSequence o) throws CompressorException, IOException {
 
 		IteratorTripleStringWrapper itsw = createIteratorTripleStringWrapperFromQuadsFile(f);
 		return filter(itsw, s, p, o);

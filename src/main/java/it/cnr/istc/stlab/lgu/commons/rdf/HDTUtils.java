@@ -8,8 +8,11 @@ import org.rdfhdt.hdt.hdt.HDTManager;
 import org.rdfhdt.hdt.options.HDTSpecification;
 import org.rdfhdt.hdt.rdf.TripleWriter;
 import org.rdfhdt.hdt.triples.IteratorTripleString;
+import org.rdfhdt.hdt.triples.TripleString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import it.cnr.istc.stlab.lgu.commons.iterations.ClosableIterator;
 
 public class HDTUtils {
 
@@ -31,10 +34,11 @@ public class HDTUtils {
 	public static void transformInHDT(String fileIn, String fileOut, String base) throws Exception {
 		TripleWriter writer = HDTManager.getHDTWriter(fileOut, base, new HDTSpecification());
 		logger.trace("Getting writer");
-		IteratorTripleStringWrapper itsw = StreamRDFUtils.createIteratorTripleStringWrapperFromFile(fileIn);
+		ClosableIterator<TripleString> itsw = StreamRDFUtils.createIteratorTripleStringWrapperFromFile(fileIn);
 		while (itsw.hasNext()) {
 			writer.addTriple(itsw.next());
 		}
+		itsw.close();
 		logger.trace("Closing");
 		writer.close();
 	}

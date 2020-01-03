@@ -1,15 +1,18 @@
 package it.cnr.istc.stlab.lgu.commons.rdf;
 
+import java.io.InputStream;
 import java.util.Iterator;
 
 import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.core.Quad;
 
-public class IteratorTripleFromQuads implements Iterator<Triple> {
+import it.cnr.istc.stlab.lgu.commons.iterations.ClosableIterator;
 
-	private Iterator<Quad> originalIterator;
+public class IteratorTripleFromQuads implements Iterator<Triple>, ClosableIterator<Triple> {
 
-	public IteratorTripleFromQuads(Iterator<Quad> originalIterator) {
+	private ClosableIterator<Quad> originalIterator;
+
+	public IteratorTripleFromQuads(ClosableIterator<Quad> originalIterator) {
 		this.originalIterator = originalIterator;
 	}
 
@@ -21,6 +24,16 @@ public class IteratorTripleFromQuads implements Iterator<Triple> {
 	@Override
 	public Triple next() {
 		return originalIterator.next().asTriple();
+	}
+
+	@Override
+	public void close() {
+		originalIterator.close();
+	}
+
+	@Override
+	public InputStream getInputStream() {
+		return originalIterator.getInputStream();
 	}
 
 }
