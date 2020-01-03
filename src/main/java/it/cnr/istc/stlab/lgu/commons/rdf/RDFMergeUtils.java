@@ -108,12 +108,16 @@ public class RDFMergeUtils {
 		}
 
 		StreamRDF stream = StreamRDFWriter.getWriterStream(os, lang);
-
-		filesToMerge.stream().parallel().forEach(file -> {
+		
+		for(String file:filesToMerge) {
 			logger.trace("Parsing {}",file);
 			RDFDataMgr.parse(stream, file);
 			logger.trace("{} parsed!",file);
-		});
+		}
+
+//		filesToMerge.stream().parallel().forEach(file -> {
+//			
+//		});
 
 		os.flush();
 		stream.finish();
