@@ -91,7 +91,7 @@ public class RDFMergeUtils {
 
 	}
 
-	public static void mergeAsNTBZ2(List<String> filesToMerge, String fileOut, Lang lang, CompressionFormat cf)
+	public static void mergeFiles(List<String> filesToMerge, String fileOut, Lang lang, CompressionFormat cf)
 			throws CompressorException, IOException {
 
 		OutputStream os;
@@ -108,9 +108,13 @@ public class RDFMergeUtils {
 		}
 
 		StreamRDF stream = StreamRDFWriter.getWriterStream(os, lang);
-		for (String file : filesToMerge) {
+
+		filesToMerge.stream().parallel().forEach(file -> {
+			logger.trace("Parsing {}",file);
 			RDFDataMgr.parse(stream, file);
-		}
+			logger.trace("{} parsed!",file);
+		});
+
 		os.flush();
 		stream.finish();
 		os.close();
