@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import it.cnr.istc.stlab.lgu.commons.iterations.ClosableIterator;
+import it.cnr.istc.stlab.lgu.commons.iterations.ProgressCounter;
 
 public class HDTUtils {
 
@@ -51,8 +52,10 @@ public class HDTUtils {
 		TripleWriter writer = HDTManager.getHDTWriter(fileOut, base, new HDTSpecification());
 		logger.trace("Getting writer");
 		ClosableIterator<TripleString> itsw = StreamRDFUtils.createIteratorTripleStringWrapperFromFile(fileIn);
+		ProgressCounter pc = new ProgressCounter();
 		while (itsw.hasNext()) {
 			writer.addTriple(itsw.next());
+			pc.increase();
 		}
 		itsw.close();
 		logger.trace("Closing");
