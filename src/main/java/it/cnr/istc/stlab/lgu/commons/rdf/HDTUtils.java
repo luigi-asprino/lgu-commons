@@ -31,13 +31,21 @@ public class HDTUtils {
 
 	public static void transformInHDT(String fileIn, String fileOut, String base) throws Exception {
 		logger.info("Generate HDT from {}", fileIn);
-		HDTManager.generateHDT(fileIn, base, RDFNotation.NTRIPLES, new HDTSpecification(), new ProgressListener() {
+		HDT hdt = HDTManager.generateHDT(fileIn, base, RDFNotation.NTRIPLES, new HDTSpecification(),
+				new ProgressListener() {
+					@Override
+					public void notifyProgress(float level, String message) {
+						logger.info("Generate {}", message);
+					}
+				});
+		hdt.saveToHDT(fileOut, new ProgressListener() {
+
 			@Override
 			public void notifyProgress(float level, String message) {
-				logger.info("{}", message);
+				logger.info("Save {}", message);
 			}
 		});
-		logger.info("{} generated!",fileOut);
+		logger.info("{} generated!", fileOut);
 //		TripleWriter writer = HDTManager.getHDTWriter(fileOut, base, new HDTSpecification());
 //		logger.trace("Getting writer");
 //		ClosableIterator<TripleString> itsw = StreamRDFUtils.createIteratorTripleStringWrapperFromFile(fileIn);

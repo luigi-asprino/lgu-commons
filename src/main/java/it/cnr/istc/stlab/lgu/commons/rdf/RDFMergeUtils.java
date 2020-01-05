@@ -93,7 +93,7 @@ public class RDFMergeUtils {
 
 	public static void mergeFiles(List<String> filesToMerge, String fileOut, Lang lang, CompressionFormat cf)
 			throws CompressorException, IOException {
-		
+
 		logger.info("Merging files");
 
 		OutputStream os;
@@ -110,15 +110,11 @@ public class RDFMergeUtils {
 		}
 
 		StreamRDF stream = StreamRDFWriter.getWriterStream(os, lang);
-		int c =0;
-		for(String file:filesToMerge) {
-			logger.info("Parsing {}/{} {}",c++,filesToMerge.size(),file);
+		int c = 0;
+		for (String file : filesToMerge) {
+			logger.info("Parsing {}/{} {}", c++, filesToMerge.size(), file);
 			RDFDataMgr.parse(stream, file);
 		}
-
-//		filesToMerge.stream().parallel().forEach(file -> {
-//			
-//		});
 
 		os.flush();
 		stream.finish();
