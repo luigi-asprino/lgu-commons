@@ -16,7 +16,6 @@ import org.apache.jena.riot.system.PrefixMapFactory;
 import org.apache.jena.riot.tokens.Tokenizer;
 import org.apache.jena.riot.tokens.TokenizerFactory;
 import org.apache.jena.sparql.util.Context;
-import org.rdfhdt.hdt.triples.TripleString;
 
 public class RDFParsers {
 
