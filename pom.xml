@@ -138,6 +138,7 @@
 		<opencsv.version>2.3</opencsv.version>
 		<orgjson.version>20180130</orgjson.version>
 		<rdfhdtapi.version>2.1.1-SNAPSHOT</rdfhdtapi.version>
+		<rocksmap.version>0.0.3.pr</rocksmap.version>
 		<slf4j.version>1.7.7</slf4j.version>
 	</properties>
 
@@ -157,6 +158,12 @@
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>${commonsio.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>it.cnr.istc.stlab</groupId>
+			<artifactId>rocksmap</artifactId>
+			<version>${rocksmap.version}</version>
 		</dependency>
 
 		<!-- RDF-HDT API -->

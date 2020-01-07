@@ -1,10 +1,13 @@
-package it.cnr.istc.stlab.lgu.commons.rdf;
+package it.cnr.istc.stlab.lgu.commons.rdf.hdt;
 
 import java.io.IOException;
 
 import org.rdfhdt.hdt.exceptions.NotFoundException;
 import org.rdfhdt.hdt.hdt.HDT;
 import org.rdfhdt.hdt.hdt.HDTManager;
+import org.rdfhdt.hdt.hdt.writer.TripleWriterHDT;
+import org.rdfhdt.hdt.listener.ProgressListener;
+import org.rdfhdt.hdt.options.HDTOptions;
 import org.rdfhdt.hdt.options.HDTSpecification;
 import org.rdfhdt.hdt.rdf.TripleWriter;
 import org.rdfhdt.hdt.triples.IteratorTripleString;
@@ -14,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import it.cnr.istc.stlab.lgu.commons.iterations.ClosableIterator;
 import it.cnr.istc.stlab.lgu.commons.iterations.ProgressCounter;
+import it.cnr.istc.stlab.lgu.commons.rdf.StreamRDFUtils;
 
 public class HDTUtils {
 
@@ -33,22 +37,7 @@ public class HDTUtils {
 	}
 
 	public static void transformInHDT(String fileIn, String fileOut, String base) throws Exception {
-//		logger.info("Generate HDT from {}", fileIn);
-//		HDT hdt = HDTManager.generateHDT(fileIn, base, RDFNotation.NTRIPLES, new HDTSpecification(),
-//				new ProgressListener() {
-//					@Override
-//					public void notifyProgress(float level, String message) {
-//						logger.info("Generate {}", message);
-//					}
-//				});
-//		hdt.saveToHDT(fileOut, new ProgressListener() {
-//
-//			@Override
-//			public void notifyProgress(float level, String message) {
-//				logger.info("Save {}", message);
-//			}
-//		});
-//		logger.info("{} generated!", fileOut);
+
 		TripleWriter writer = HDTManager.getHDTWriter(fileOut, base, new HDTSpecification());
 		logger.trace("Getting writer");
 		ClosableIterator<TripleString> itsw = StreamRDFUtils.createIteratorTripleStringWrapperFromFile(fileIn);
@@ -60,6 +49,33 @@ public class HDTUtils {
 		itsw.close();
 		logger.trace("Closing");
 		writer.close();
+	}
+
+	public static void transformInHDT(String fileIn, String fileOut, String tempFolder, String base) throws Exception {
+
+		HDTOptions opts = new HDTSpecification();
+
+		opts.set("tempDictionary.impl", "dictionaryRocks");
+		opts.set("tempTriples.impl", "rocks");
+		opts.set("tempfolder", tempFolder);
+
+		TripleWriterHDT writer = (TripleWriterHDT) HDTManager.getHDTWriter(fileOut, base, opts);
+		logger.info("Getting writer");
+		ClosableIterator<TripleString> itsw = StreamRDFUtils.createIteratorTripleStringWrapperFromFile(fileIn);
+		ProgressCounter pc = new ProgressCounter();
+		while (itsw.hasNext()) {
+			writer.addTriple(itsw.next());
+			pc.increase();
+		}
+		itsw.close();
+		logger.info("Closing");
+		writer.close(new ProgressListener() {
+
+			@Override
+			public void notifyProgress(float level, String message) {
+				logger.info("Close:: {}", message);
+			}
+		});
 	}
 
 }
