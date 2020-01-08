@@ -36,6 +36,7 @@ import it.cnr.istc.stlab.lgu.commons.files.File.CompressionFormat;
 import it.cnr.istc.stlab.lgu.commons.files.InputStreamFactory;
 import it.cnr.istc.stlab.lgu.commons.iterations.ClosableIterator;
 import it.cnr.istc.stlab.lgu.commons.iterations.ClosableIteratorFromInputStream;
+import it.cnr.istc.stlab.lgu.commons.iterations.ProgressCounter;
 
 public class StreamRDFUtils {
 
@@ -118,11 +119,14 @@ public class StreamRDFUtils {
 	public static long estimateSearchResults(String f, CharSequence s, CharSequence p, CharSequence o)
 			throws CompressorException, IOException {
 		long r = 0;
-		Iterator<TripleString> itsw = createFilteredIteratorTripleStringFromFile(f, s, p, o);
+		ProgressCounter pc = new ProgressCounter();
+		ClosableIterator<TripleString> itsw = createFilteredIteratorTripleStringFromFile(f, s, p, o);
 		while (itsw.hasNext()) {
+			pc.increase();
 			itsw.next();
 			r++;
 		}
+		itsw.close();
 		return r;
 
 	}
