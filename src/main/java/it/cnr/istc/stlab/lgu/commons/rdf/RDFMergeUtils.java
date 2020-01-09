@@ -63,6 +63,32 @@ public class RDFMergeUtils {
 		return m;
 	}
 
+	public static Model merge(Map<String, String> nsPrefixes, String[] paths) throws FileNotFoundException {
+		Model m = ModelFactory.createDefaultModel();
+		m.setNsPrefixes(nsPrefixes);
+		for (int i = 0; i < paths.length; i++) {
+			logger.info("Processing folder {}", paths[i]);
+			if (new File(paths[i]).isDirectory()) {
+
+				for (String f : FileUtils.getFilesUnderTreeRec(paths[i])) {
+					logger.trace("Processing file {}", f);
+					if (FilenameUtils.isExtension(f, EXTENSIONS)) {
+						try {
+							RDFDataMgr.read(m, f);
+						} catch (Exception e) {
+							logger.error("{} {}", e.getMessage(), f);
+						}
+					}
+				}
+				logger.info("{} processed", paths[i]);
+			} else {
+				RDFDataMgr.read(m, paths[i]);
+			}
+		}
+		logger.info("Model size {}", m.size());
+		return m;
+	}
+
 	public static void mergeAsHDT(List<String> files, String fileOut, String base) {
 		System.out.println("merging");
 
