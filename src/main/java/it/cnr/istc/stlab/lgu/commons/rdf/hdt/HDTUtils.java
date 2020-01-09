@@ -58,6 +58,7 @@ public class HDTUtils {
 		opts.set("tempDictionary.impl", "dictionaryRocks");
 		opts.set("tempTriples.impl", "rocks");
 		opts.set("tempfolder", tempFolder);
+		opts.set("dictionary.type", "dictionaryFourBig");
 
 		TripleWriterHDT writer = (TripleWriterHDT) HDTManager.getHDTWriter(fileOut, base, opts);
 		logger.info("Getting writer");
