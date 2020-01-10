@@ -87,10 +87,10 @@ public class DBPedia {
 		return e;
 	}
 
-	public static void main(String[] args) throws FileNotFoundException {
-		System.out.println(getGeoCodingFromURI("http://dbpedia.org/resource/Palazzo_Ludovisi").toString());
-		System.out.println(getGeoCodingFromURI("http://dbpedia.org/resource/Palazzo_Montecitorio").toString());
-
-	}
+//	public static void main(String[] args) throws FileNotFoundException {
+//		System.out.println(getGeoCodingFromURI("http://dbpedia.org/resource/Palazzo_Ludovisi").toString());
+//		System.out.println(getGeoCodingFromURI("http://dbpedia.org/resource/Palazzo_Montecitorio").toString());
+//
+//	}
 
 }

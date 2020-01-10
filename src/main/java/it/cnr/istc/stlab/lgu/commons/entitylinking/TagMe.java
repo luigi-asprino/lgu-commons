@@ -18,6 +18,9 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import it.cnr.istc.stlab.lgu.commons.entitylinking.model.Mention;
+import it.cnr.istc.stlab.lgu.commons.entitylinking.model.Result;
+import it.cnr.istc.stlab.lgu.commons.entitylinking.model.ScoredResult;
 import it.cnr.istc.stlab.lgu.commons.files.FileUtils;
 import it.cnr.istc.stlab.lgu.commons.model.Lang;
 
@@ -29,6 +32,18 @@ public class TagMe {
 	private static Logger logger = LoggerFactory.getLogger(TagMe.class);
 
 	public static List<String> getMentionedEntitiesURIUsingTagMe(String text, Lang l) throws IOException {
+
+		List<String> result = new ArrayList<>();
+		Result r = getMentions(text, l);
+		r.getAnnotations().forEach(m -> {
+			m.getMentionedEntities().forEach(s -> {
+				result.add(((String) ((ScoredResult) s).getEntity()));
+			});
+		});
+		return result;
+	}
+
+	public static Result getMentions(String text, Lang l) throws IOException {
 
 		new File(CACHED_RESULTS_FOLDER).mkdir();
 		String result = "";
@@ -73,17 +88,28 @@ public class TagMe {
 
 		}
 
-		List<String> results = new ArrayList<>();
+		List<Mention> results = new ArrayList<>();
 
 		JSONObject obj = new JSONObject(result);
 		JSONArray annotations = obj.getJSONArray("annotations");
 		for (int i = 0; i < annotations.length(); i++) {
 
 			JSONObject annotation = annotations.getJSONObject(i);
-			results.add(getDBpediaURI(annotation.getString("title"), Lang.EN));
 
+			int start = annotation.getInt("start");
+			int end = annotation.getInt("end");
+			double score = annotation.getDouble("link_probability");
+
+			Mention m = new Mention(start, end, text.substring(start, end));
+
+			m.addMentionedEntities(new ScoredResult(score, getDBpediaURI(annotation.getString("title"), Lang.EN)));
+
+			results.add(m);
 		}
-		return results;
+
+		Result r = new Result(text, results);
+
+		return r;
 	}
 
 	private static String getURLParameters(String text, Lang lang) {
@@ -116,10 +142,10 @@ public class TagMe {
 		return null;
 	}
 
-	public static void main(String[] args) throws IOException {
-		getMentionedEntitiesURIUsingTagMe("Palazzo Montecitorio - Camera dei Deputati", Lang.IT).forEach(s -> {
-			System.out.println(s);
-		});
-	}
+//	public static void main(String[] args) throws IOException {
+//		getMentionedEntitiesURIUsingTagMe("Palazzo Montecitorio - Camera dei Deputati", Lang.IT).forEach(s -> {
+//			System.out.println(s);
+//		});
+//	}
 
 }
