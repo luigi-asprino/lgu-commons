@@ -34,6 +34,7 @@ public class HDTUtils {
 			if (c++ == limit)
 				break;
 		}
+		hdt.close();
 	}
 
 	public static void transformInHDT(String fileIn, String fileOut, String base) throws Exception {
