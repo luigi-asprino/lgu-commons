@@ -13,10 +13,10 @@ import java.util.List;
 import javax.net.ssl.HttpsURLConnection;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import it.cnr.istc.stlab.lgu.commons.entitylinking.model.Mention;
 import it.cnr.istc.stlab.lgu.commons.entitylinking.model.Result;
@@ -29,12 +29,16 @@ public class TagMe {
 	private static String tagMeUrl = "https://tagme.d4science.org/tagme/tag";
 	private static final String CACHED_RESULTS_FOLDER = "tagme_cached_results";
 	private static String tagme_key;
-	private static Logger logger = LoggerFactory.getLogger(TagMe.class);
+	private static Logger logger = LogManager.getLogger(TagMe.class);
+
+	private static enum SenseInventory {
+		WIKI, DBPEDIA
+	};
 
 	public static List<String> getMentionedEntitiesURIUsingTagMe(String text, Lang l) throws IOException {
 
 		List<String> result = new ArrayList<>();
-		Result r = getMentions(text, l);
+		Result r = getMentions(text, l, "dbpedia");
 		r.getAnnotations().forEach(m -> {
 			m.getMentionedEntities().forEach(s -> {
 				result.add(((String) ((ScoredResult) s).getEntity()));
@@ -43,11 +47,24 @@ public class TagMe {
 		return result;
 	}
 
-	public static Result getMentions(String text, Lang l) throws IOException {
+	public static List<String> getMentionedEntitiesURIUsingTagMe(String text, Lang l, String senseInventory)
+			throws IOException {
+
+		List<String> result = new ArrayList<>();
+		Result r = getMentions(text, l, senseInventory);
+		r.getAnnotations().forEach(m -> {
+			m.getMentionedEntities().forEach(s -> {
+				result.add(((String) ((ScoredResult) s).getEntity()));
+			});
+		});
+		return result;
+	}
+
+	public static Result getMentions(String text, Lang l, String senseInventory) throws IOException {
 
 		new File(CACHED_RESULTS_FOLDER).mkdir();
 		String result = "";
-		String textDigest = DigestUtils.md5Hex(text + text.toString());
+		String textDigest = DigestUtils.md5Hex(text + l.toString() + senseInventory);
 		if (new File(CACHED_RESULTS_FOLDER + "/" + textDigest).exists()) {
 
 			logger.trace("Retrieving Cached Result");
@@ -66,7 +83,7 @@ public class TagMe {
 			conn.setDoOutput(true);
 			DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
 
-			wr.writeBytes(getURLParameters(text, Lang.IT));
+			wr.writeBytes(getURLParameters(text, l));
 			wr.flush();
 			wr.close();
 
@@ -88,6 +105,8 @@ public class TagMe {
 
 		}
 
+		SenseInventory si = getSenseInventoryFromString(senseInventory);
+
 		List<Mention> results = new ArrayList<>();
 
 		JSONObject obj = new JSONObject(result);
@@ -102,7 +121,7 @@ public class TagMe {
 
 			Mention m = new Mention(start, end, text.substring(start, end));
 
-			m.addMentionedEntities(new ScoredResult(score, getDBpediaURI(annotation.getString("title"), Lang.EN)));
+			m.addMentionedEntities(new ScoredResult(score, getURI(annotation.getString("title"), l, si)));
 
 			results.add(m);
 		}
@@ -140,6 +159,39 @@ public class TagMe {
 			return "http://it.dbpedia.org/resource/" + tag;
 		}
 		return null;
+	}
+
+	private static String getURI(String tag, Lang l, SenseInventory s) {
+		switch (s) {
+		case WIKI:
+			return getWikipediaURI(tag, l);
+		case DBPEDIA:
+		default:
+			return getDBpediaURI(tag, l);
+
+		}
+	}
+
+	private static String getWikipediaURI(String tag, Lang l) {
+		tag = tag.replace(' ', '_');
+		switch (l) {
+		case EN:
+			return "https://en.wikipedia.org/wiki/" + tag;
+		case IT:
+			return "https://it.wikipedia.org/wiki/" + tag;
+		}
+		return null;
+	}
+
+	private static SenseInventory getSenseInventoryFromString(String senseInventorString) {
+		SenseInventory r = null;
+		if (senseInventorString.equalsIgnoreCase("Wikipedia") || senseInventorString.equalsIgnoreCase("wiki")) {
+			r = SenseInventory.WIKI;
+		} else {
+			r = SenseInventory.DBPEDIA;
+		}
+
+		return r;
 	}
 
 //	public static void main(String[] args) throws IOException {
