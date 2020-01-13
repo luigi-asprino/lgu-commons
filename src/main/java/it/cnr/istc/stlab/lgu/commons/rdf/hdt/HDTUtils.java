@@ -54,7 +54,7 @@ public class HDTUtils {
 	}
 
 	public static void transformInHDT(String fileIn, String fileOut, String tempFolder, String base) throws Exception {
-		transformInHDT(fileIn, fileOut, tempFolder, base, false);
+		transformInHDT(fileIn, fileOut, tempFolder, base, true);
 	}
 
 	public static void transformInHDT(String fileIn, String fileOut, String tempFolder, String base, boolean parallel)
