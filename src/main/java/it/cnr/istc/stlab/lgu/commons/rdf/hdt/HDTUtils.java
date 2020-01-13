@@ -1,6 +1,7 @@
 package it.cnr.istc.stlab.lgu.commons.rdf.hdt;
 
 import java.io.IOException;
+import java.util.stream.Stream;
 
 import org.rdfhdt.hdt.exceptions.NotFoundException;
 import org.rdfhdt.hdt.hdt.HDT;
@@ -53,26 +54,43 @@ public class HDTUtils {
 	}
 
 	public static void transformInHDT(String fileIn, String fileOut, String tempFolder, String base) throws Exception {
+		transformInHDT(fileIn, fileOut, tempFolder, base, false);
+	}
+
+	public static void transformInHDT(String fileIn, String fileOut, String tempFolder, String base, boolean parallel)
+			throws Exception {
 
 		HDTOptions opts = new HDTSpecification();
 
 		opts.set("tempDictionary.impl", "dictionaryRocks");
 		opts.set("tempTriples.impl", "rocks");
 		opts.set("tempfolder", tempFolder);
-//		opts.set("dictionary.type", "dictionaryFourBig");
 
 		TripleWriterHDT writer = (TripleWriterHDT) HDTManager.getHDTWriter(fileOut, base, opts);
 		logger.info("Getting writer");
-		ClosableIterator<TripleString> itsw = StreamRDFUtils.createIteratorTripleStringWrapperFromFile(fileIn);
-		ProgressCounter pc = new ProgressCounter();
-		while (itsw.hasNext()) {
-			writer.addTriple(itsw.next());
-			pc.increase();
+		if (parallel) {
+			Stream<TripleString> stream = StreamRDFUtils.createTripleStringStream(fileIn);
+			ProgressCounter pc = new ProgressCounter();
+			stream.parallel().forEach(ts -> {
+				try {
+					writer.addTriple(ts);
+					pc.increase();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			});
+		} else {
+			ClosableIterator<TripleString> itsw = StreamRDFUtils.createIteratorTripleStringWrapperFromFile(fileIn);
+			ProgressCounter pc = new ProgressCounter();
+			while (itsw.hasNext()) {
+				writer.addTriple(itsw.next());
+				pc.increase();
+			}
+			itsw.close();
 		}
-		itsw.close();
+
 		logger.info("Closing");
 		writer.close(new ProgressListener() {
-
 			@Override
 			public void notifyProgress(float level, String message) {
 				logger.info("Close:: {}", message);

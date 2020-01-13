@@ -1,8 +1,10 @@
 package it.cnr.istc.stlab.lgu.commons.iterations;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 public class ProgressCounter {
 
-	private long progress;
+	private AtomicLong progress = new AtomicLong(0L);
 	private long steps = 10;
 	private long check;
 	private boolean absolute = false;
@@ -17,10 +19,9 @@ public class ProgressCounter {
 	}
 
 	public void increase() {
-		progress++;
-		if (progress % check == 0) {
+		if (progress.incrementAndGet() % check == 0) {
 			if (!absolute) {
-				long perc = (progress / check) * steps;
+				long perc = (progress.longValue() / check) * steps;
 				if (perc == 100) {
 					System.out.println(perc + "%");
 				} else {
