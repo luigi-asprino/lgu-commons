@@ -1,6 +1,9 @@
 package it.cnr.istc.stlab.lgu.commons.iterations;
 
+import java.text.NumberFormat;
 import java.util.concurrent.atomic.AtomicLong;
+
+import org.apache.log4j.Logger;
 
 public class ProgressCounter {
 
@@ -8,14 +11,28 @@ public class ProgressCounter {
 	private long steps = 10;
 	private long check;
 	private boolean absolute = false;
+	private NumberFormat format;
+	private Logger logger;
 
 	public ProgressCounter() {
 		check = 10000;
 		absolute = true;
+		init();
 	}
 
 	public ProgressCounter(long until) {
 		check = until / steps;
+		init();
+	}
+
+	private void init() {
+		format = NumberFormat.getInstance();
+		format.setGroupingUsed(true);
+	}
+
+	public ProgressCounter setLogger(Logger logger) {
+		this.logger = logger;
+		return this;
 	}
 
 	public void increase() {
@@ -23,13 +40,21 @@ public class ProgressCounter {
 			if (!absolute) {
 				long perc = (progress.longValue() / check) * steps;
 				if (perc == 100) {
-					System.out.println(perc + "%");
+					logMessage(perc + "%");
 				} else {
-					System.out.print(perc + "% ");
+					logMessage(perc + "% ");
 				}
 			} else {
-				System.out.println(progress + " ");
+				logMessage(format.format(progress) + " ");
 			}
+		}
+	}
+
+	private void logMessage(String m) {
+		if (logger != null) {
+			logger.info(m);
+		} else {
+			System.out.println(m);
 		}
 	}
 
