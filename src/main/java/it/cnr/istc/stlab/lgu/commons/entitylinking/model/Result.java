@@ -1,7 +1,11 @@
 package it.cnr.istc.stlab.lgu.commons.entitylinking.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Result {
 
@@ -18,7 +22,7 @@ public class Result {
 	}
 
 	public Result() {
-		this("",new ArrayList<>());
+		this("", new ArrayList<>());
 	}
 
 	public String getText() {
@@ -39,6 +43,17 @@ public class Result {
 
 	public void addAnnotation(Mention annotation) {
 		this.annotations.add(annotation);
+	}
+
+	@JsonIgnore
+	public Set<Object> getMentionedEntities() {
+		Set<Object> result = new HashSet<>();
+		this.getAnnotations().forEach(ann -> {
+			ann.getMentionedEntities().forEach(sr -> {
+				result.add(((ScoredResult) sr).getEntity());
+			});
+		});
+		return result;
 	}
 
 	@Override
