@@ -30,7 +30,7 @@ public class testMerge {
 		});
 
 		long t0 = System.currentTimeMillis();
-		ParallelMergeSort.mergeSort(0, length, (k1, k2) -> get(ba2, k1) - get(ba2, k2), (k1, k2) -> swap(ba2, k1, k2));
+		Arrays.parallelQuickSort(0, length, (k1, k2) -> get(ba3, k1) - get(ba3, k2), (k1, k2) -> swap(ba3, k1, k2));
 		long t1 = System.currentTimeMillis();
 		System.out.println(t1 - t0);
 
@@ -40,7 +40,7 @@ public class testMerge {
 		System.out.println(t1 - t0);
 
 		t0 = System.currentTimeMillis();
-		Arrays.parallelQuickSort(0, length, (k1, k2) -> get(ba3, k1) - get(ba3, k2), (k1, k2) -> swap(ba3, k1, k2));
+		ParallelMergeSort.mergeSort(0, length, (k1, k2) -> get(ba2, k1) - get(ba2, k2), (k1, k2) -> swap(ba2, k1, k2));
 		t1 = System.currentTimeMillis();
 		System.out.println(t1 - t0);
 
