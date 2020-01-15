@@ -16,7 +16,7 @@ public class testMerge {
 
 	public static void main(String[] args) throws RocksDBException {
 
-		int length = 100000000;
+		int length = 1000000000;
 //		int length = 100000;
 		int[][] ba1 = IntBigArrays.newBigArray(length);
 		int[][] ba2 = IntBigArrays.newBigArray(length);
@@ -34,10 +34,10 @@ public class testMerge {
 		long t1 = System.currentTimeMillis();
 		System.out.println(t1 - t0);
 
-		t0 = System.currentTimeMillis();
-		BigArrays.mergeSort(0, length, (k1, k2) -> get(ba1, k1) - get(ba1, k2), (k1, k2) -> swap(ba1, k1, k2));
-		t1 = System.currentTimeMillis();
-		System.out.println(t1 - t0);
+//		t0 = System.currentTimeMillis();
+//		BigArrays.mergeSort(0, length, (k1, k2) -> get(ba1, k1) - get(ba1, k2), (k1, k2) -> swap(ba1, k1, k2));
+//		t1 = System.currentTimeMillis();
+//		System.out.println(t1 - t0);
 
 		t0 = System.currentTimeMillis();
 		ParallelMergeSort.mergeSort(0, length, (k1, k2) -> get(ba2, k1) - get(ba2, k2), (k1, k2) -> swap(ba2, k1, k2));
