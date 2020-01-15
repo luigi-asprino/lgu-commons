@@ -1,7 +1,6 @@
 package it.cnr.istc.stlab.lgu.commons.arrays;
 
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.TimeUnit;
 
 import it.unimi.dsi.fastutil.BigSwapper;
 import it.unimi.dsi.fastutil.longs.LongComparator;
@@ -50,13 +49,9 @@ public class ParallelMergeSort extends java.util.concurrent.RecursiveAction {
 
 	public static void mergeSort(final long from, final long to, final LongComparator comp, final BigSwapper swapper) {
 		ParallelMergeSort pms = new ParallelMergeSort(from, to, comp, swapper);
-		ForkJoinPool fjp = ForkJoinPool.commonPool();
-		fjp.invoke(pms);
-		try {
-			fjp.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		final ForkJoinPool pool = new ForkJoinPool(Runtime.getRuntime().availableProcessors());
+		pool.invoke(pms);
+		pool.shutdown();
 	}
 
 }
