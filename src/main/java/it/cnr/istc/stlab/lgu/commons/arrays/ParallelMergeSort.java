@@ -8,7 +8,7 @@ import it.unimi.dsi.fastutil.longs.LongComparator;
 public class ParallelMergeSort extends java.util.concurrent.RecursiveAction {
 
 	private static final long serialVersionUID = 1L;
-	private static final int SMALL = 7;
+	private static final int SMALL = 8192;
 	private long from;
 	private long to;
 	private LongComparator comp;
