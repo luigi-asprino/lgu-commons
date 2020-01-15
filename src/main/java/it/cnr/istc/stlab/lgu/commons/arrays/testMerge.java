@@ -16,7 +16,7 @@ public class testMerge {
 
 	public static void main(String[] args) throws RocksDBException {
 
-		int length = 1000000000;
+		int length = 100000000;
 //		int length = 100000;
 		int[][] ba1 = IntBigArrays.newBigArray(length);
 		int[][] ba2 = IntBigArrays.newBigArray(length);
