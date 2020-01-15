@@ -14,7 +14,7 @@ import it.unimi.dsi.fastutil.ints.IntBigArrays;
 public class testMerge {
 
 	public static void main(String[] args) throws RocksDBException {
-		
+
 		int length = 100000000;
 //		int length = 100000;
 		int[][] ba1 = IntBigArrays.newBigArray(length);
@@ -38,7 +38,8 @@ public class testMerge {
 
 		for (int i = 0; i < length; i++) {
 			if (get(ba2, i) != get(ba1, i)) {
-				System.err.println("i");
+				System.err.println("Different on " + i);
+				break;
 			}
 		}
 
