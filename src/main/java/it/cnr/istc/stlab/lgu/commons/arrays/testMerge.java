@@ -39,10 +39,10 @@ public class testMerge {
 //		t1 = System.currentTimeMillis();
 //		System.out.println(t1 - t0);
 
-		t0 = System.currentTimeMillis();
-		ParallelMergeSort.mergeSort(0, length, (k1, k2) -> get(ba2, k1) - get(ba2, k2), (k1, k2) -> swap(ba2, k1, k2));
-		t1 = System.currentTimeMillis();
-		System.out.println(t1 - t0);
+//		t0 = System.currentTimeMillis();
+//		ParallelMergeSort.mergeSort(0, length, (k1, k2) -> get(ba2, k1) - get(ba2, k2), (k1, k2) -> swap(ba2, k1, k2));
+//		t1 = System.currentTimeMillis();
+//		System.out.println(t1 - t0);
 
 	}
 
