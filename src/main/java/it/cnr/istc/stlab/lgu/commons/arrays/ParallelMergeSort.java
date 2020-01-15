@@ -2,6 +2,7 @@ package it.cnr.istc.stlab.lgu.commons.arrays;
 
 import java.util.concurrent.ForkJoinPool;
 
+import it.unimi.dsi.fastutil.BigArrays;
 import it.unimi.dsi.fastutil.BigSwapper;
 import it.unimi.dsi.fastutil.longs.LongComparator;
 
@@ -27,11 +28,12 @@ public class ParallelMergeSort extends java.util.concurrent.RecursiveAction {
 		final long length = to - from;
 		// Insertion sort on smallest arrays
 		if (length < SMALL) {
-			for (long i = from; i < to; i++) {
-				for (long j = i; j > from && (comp.compare(j - 1, j) > 0); j--) {
-					swapper.swap(j, j - 1);
-				}
-			}
+//			for (long i = from; i < to; i++) {
+//				for (long j = i; j > from && (comp.compare(j - 1, j) > 0); j--) {
+//					swapper.swap(j, j - 1);
+//				}
+//			}
+			BigArrays.mergeSort(from, to, comp, swapper);
 			return;
 		}
 		// Recursively sort halves
