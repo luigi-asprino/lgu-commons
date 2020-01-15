@@ -45,14 +45,15 @@ public class ParallelMergeSort extends java.util.concurrent.RecursiveAction {
 		if (comp.compare(mid - 1, mid) <= 0)
 			return;
 		// Merge sorted halves
-		ParallelInPlaceMerge pipm = new ParallelInPlaceMerge(from, mid, to, comp, swapper);
-		invokeAll(pipm);
+		invokeAll(new ParallelInPlaceMerge(from, mid, to, comp, swapper));
 	}
 
 	public static void mergeSort(final long from, final long to, final LongComparator comp, final BigSwapper swapper) {
-		ForkJoinPool p = ForkJoinPool.commonPool();
+		ParallelMergeSort pms = new ParallelMergeSort(from, to, comp, swapper);
+		ForkJoinPool fjp = ForkJoinPool.commonPool();
+		fjp.invoke(pms);
 		try {
-			p.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
+			fjp.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
