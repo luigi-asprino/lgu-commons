@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.compress.compressors.CompressorException;
@@ -18,21 +19,21 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.system.StreamRDF;
 import org.apache.jena.riot.system.StreamRDFWriter;
-import org.apache.jena.util.iterator.ClosableIterator;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.rdfhdt.hdt.hdt.HDTManager;
+import org.rdfhdt.hdt.hdt.writer.TripleWriterHDT;
+import org.rdfhdt.hdt.options.HDTOptions;
 import org.rdfhdt.hdt.options.HDTSpecification;
-import org.rdfhdt.hdt.rdf.TripleWriter;
-import org.rdfhdt.hdt.triples.TripleString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import it.cnr.istc.stlab.lgu.commons.files.File.CompressionFormat;
 import it.cnr.istc.stlab.lgu.commons.files.FileUtils;
+import it.cnr.istc.stlab.lgu.commons.iterations.ProgressCounter;
 
 public class RDFMergeUtils {
 
 	private static final String[] EXTENSIONS = new String[] { "xml", "rdf", "ttl", "nt", "owl" };
-	private static Logger logger = LoggerFactory.getLogger(RDFMergeUtils.class);
+	private static Logger logger = LogManager.getLogger(RDFMergeUtils.class);
 
 	public static void mergeFolders(Map<String, String> nsPrefixes, String[] folderPath, String fileOut, String lang)
 			throws FileNotFoundException {
@@ -46,20 +47,20 @@ public class RDFMergeUtils {
 		Model m = ModelFactory.createDefaultModel();
 		m.setNsPrefixes(nsPrefixes);
 		for (int i = 0; i < folderPath.length; i++) {
-			logger.info("Processing folder {}", folderPath[i]);
+			logger.info(String.format("Processing folder {}", folderPath[i]));
 			for (String f : FileUtils.getFilesUnderTreeRec(folderPath[i])) {
-				logger.trace("Processing file {}", f);
+				logger.trace(String.format("Processing file {}", f));
 				if (FilenameUtils.isExtension(f, EXTENSIONS)) {
 					try {
 						RDFDataMgr.read(m, f);
 					} catch (Exception e) {
-						logger.error("{} {}", e.getMessage(), f);
+						logger.error(String.format("{} {}", e.getMessage(), f));
 					}
 				}
 			}
-			logger.info("{} processed", folderPath[i]);
+			logger.info(String.format("{} processed", folderPath[i]));
 		}
-		logger.info("Model size {}", m.size());
+		logger.info(String.format("Model size {}", m.size()));
 		return m;
 	}
 
@@ -67,49 +68,62 @@ public class RDFMergeUtils {
 		Model m = ModelFactory.createDefaultModel();
 		m.setNsPrefixes(nsPrefixes);
 		for (int i = 0; i < paths.length; i++) {
-			logger.info("Processing folder {}", paths[i]);
+			logger.info(String.format("Processing folder {}", paths[i]));
 			if (new File(paths[i]).isDirectory()) {
 
 				for (String f : FileUtils.getFilesUnderTreeRec(paths[i])) {
-					logger.trace("Processing file {}", f);
+					logger.trace(String.format("Processing file {}", f));
 					if (FilenameUtils.isExtension(f, EXTENSIONS)) {
 						try {
 							RDFDataMgr.read(m, f);
 						} catch (Exception e) {
-							logger.error("{} {}", e.getMessage(), f);
+							logger.error(String.format("{} {}", e.getMessage(), f));
 						}
 					}
 				}
-				logger.info("{} processed", paths[i]);
+				logger.info(String.format("{} processed", paths[i]));
 			} else {
 				RDFDataMgr.read(m, paths[i]);
 			}
 		}
-		logger.info("Model size {}", m.size());
+		logger.info(String.format("Model size {}", m.size()));
 		return m;
 	}
 
-	public static void mergeAsHDT(List<String> files, String fileOut, String base) {
-		System.out.println("merging");
+	public static void mergeAsHDT(List<String> files, String tempFolder, String fileOut, String base) {
+		logger.info("Merging files using RDF-HDT");
 
 		try {
+			AtomicLong processedFiles = new AtomicLong(0);
 
-			int filenum = 0, triples = 0;
 			logger.info("Getting HDT writer");
-			TripleWriter writer = HDTManager.getHDTWriter(fileOut, base, new HDTSpecification());
-			for (String file : files) {
+			HDTOptions opts = new HDTSpecification();
 
-				logger.info("{}/{} - Creating iterator for {}", filenum++, files.size(), file);
+			opts.set("tempDictionary.impl", "dictionaryRocks");
+			opts.set("tempTriples.impl", "rocks");
+			opts.set("tempfolder", tempFolder);
 
-				ClosableIterator<TripleString> itsw = StreamRDFUtils.createIteratorTripleStringWrapperFromFile(file);
-				while (itsw.hasNext()) {
-					writer.addTriple(itsw.next());
-					triples++;
+			TripleWriterHDT writer = (TripleWriterHDT) HDTManager.getHDTWriter(fileOut, base, opts);
+			files.parallelStream().forEach(file -> {
+				logger.info(String.format("Creating stream for {}", file));
+				ProgressCounter pc = new ProgressCounter();
+				pc.setPrefix(file);
+				pc.setLogger(logger);
+				try {
+					StreamRDFUtils.createTripleStringStream(file).parallel().forEach(ts -> {
+						try {
+							writer.addTriple(ts);
+							pc.increase();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					});
+				} catch (CompressorException | IOException e) {
+					e.printStackTrace();
 				}
-				itsw.close();
-
-			}
-			logger.info("Triples {}", triples);
+				logger.info(String.format("{}/{}", processedFiles.incrementAndGet(),
+						files.size(), file));
+			});
 			writer.close();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -138,7 +152,7 @@ public class RDFMergeUtils {
 		StreamRDF stream = StreamRDFWriter.getWriterStream(os, lang);
 		int c = 0;
 		for (String file : filesToMerge) {
-			logger.info("Parsing {}/{} {}", c++, filesToMerge.size(), file);
+			logger.info(String.format("Parsing {}/{} {}", c++, filesToMerge.size(), file));
 			RDFDataMgr.parse(stream, file);
 		}
 

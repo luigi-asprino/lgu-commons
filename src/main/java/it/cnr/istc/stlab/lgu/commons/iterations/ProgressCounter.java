@@ -11,6 +11,7 @@ public class ProgressCounter {
 	private long steps = 10;
 	private long check;
 	private boolean absolute = false;
+	private String prefix;
 	private NumberFormat format;
 	private Logger logger;
 
@@ -23,6 +24,11 @@ public class ProgressCounter {
 	public ProgressCounter(long until) {
 		check = until / steps;
 		init();
+	}
+
+	public ProgressCounter setPrefix(String p) {
+		this.prefix = p;
+		return this;
 	}
 
 	private void init() {
@@ -51,10 +57,13 @@ public class ProgressCounter {
 	}
 
 	private void logMessage(String m) {
+
+		String mPrint = prefix == null ? m : prefix + " " + m;
+
 		if (logger != null) {
-			logger.info(m);
+			logger.info(mPrint);
 		} else {
-			System.out.println(m);
+			System.out.println(mPrint);
 		}
 	}
 
