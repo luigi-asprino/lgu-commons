@@ -122,7 +122,7 @@ public class RDFMergeUtils {
 					e.printStackTrace();
 				}
 				logger.info(String.format("{}/{}", processedFiles.incrementAndGet(),
-						files.size(), file));
+						files.size()));
 			});
 			writer.close();
 		} catch (Exception e) {
