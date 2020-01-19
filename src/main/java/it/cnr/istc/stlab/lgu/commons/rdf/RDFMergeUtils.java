@@ -105,7 +105,7 @@ public class RDFMergeUtils {
 
 			TripleWriterHDT writer = (TripleWriterHDT) HDTManager.getHDTWriter(fileOut, base, opts);
 			files.parallelStream().forEach(file -> {
-				logger.info(String.format("Creating stream for {}", file));
+				logger.info(String.format("Creating stream for %s", file));
 				ProgressCounter pc = new ProgressCounter();
 				pc.setPrefix(file);
 				pc.setLogger(logger);
@@ -121,8 +121,7 @@ public class RDFMergeUtils {
 				} catch (CompressorException | IOException e) {
 					e.printStackTrace();
 				}
-				logger.info(String.format("{}/{}", processedFiles.incrementAndGet(),
-						files.size()));
+				logger.info(String.format("%d/%d", processedFiles.incrementAndGet(), files.size()));
 			});
 			writer.close();
 		} catch (Exception e) {
