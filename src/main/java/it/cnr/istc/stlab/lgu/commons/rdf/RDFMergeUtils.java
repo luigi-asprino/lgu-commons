@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Stream;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.compress.compressors.CompressorException;
@@ -23,12 +24,15 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.rdfhdt.hdt.hdt.HDTManager;
 import org.rdfhdt.hdt.hdt.writer.TripleWriterHDT;
+import org.rdfhdt.hdt.listener.ProgressListener;
 import org.rdfhdt.hdt.options.HDTOptions;
 import org.rdfhdt.hdt.options.HDTSpecification;
+import org.rdfhdt.hdt.triples.TripleString;
 
 import it.cnr.istc.stlab.lgu.commons.files.File.CompressionFormat;
 import it.cnr.istc.stlab.lgu.commons.files.FileUtils;
 import it.cnr.istc.stlab.lgu.commons.iterations.ProgressCounter;
+import it.cnr.istc.stlab.lgu.commons.process.MemoryUtils;
 
 public class RDFMergeUtils {
 
@@ -68,25 +72,25 @@ public class RDFMergeUtils {
 		Model m = ModelFactory.createDefaultModel();
 		m.setNsPrefixes(nsPrefixes);
 		for (int i = 0; i < paths.length; i++) {
-			logger.info(String.format("Processing folder {}", paths[i]));
+			logger.info(String.format("Processing folder %s", paths[i]));
 			if (new File(paths[i]).isDirectory()) {
 
 				for (String f : FileUtils.getFilesUnderTreeRec(paths[i])) {
-					logger.trace(String.format("Processing file {}", f));
+					logger.trace(String.format("Processing file %s", f));
 					if (FilenameUtils.isExtension(f, EXTENSIONS)) {
 						try {
 							RDFDataMgr.read(m, f);
 						} catch (Exception e) {
-							logger.error(String.format("{} {}", e.getMessage(), f));
+							logger.error(String.format("%s %s", e.getMessage(), f));
 						}
 					}
 				}
-				logger.info(String.format("{} processed", paths[i]));
+				logger.info(String.format("%s processed", paths[i]));
 			} else {
 				RDFDataMgr.read(m, paths[i]);
 			}
 		}
-		logger.info(String.format("Model size {}", m.size()));
+		logger.info(String.format("Model size %s", m.size()));
 		return m;
 	}
 
@@ -110,7 +114,8 @@ public class RDFMergeUtils {
 				pc.setPrefix(file);
 				pc.setLogger(logger);
 				try {
-					StreamRDFUtils.createTripleStringStream(file).parallel().forEach(ts -> {
+					Stream<TripleString> s = StreamRDFUtils.createTripleStringStream(file).parallel();
+					s.forEach(ts -> {
 						try {
 							writer.addTriple(ts);
 							pc.increase();
@@ -118,16 +123,37 @@ public class RDFMergeUtils {
 							e.printStackTrace();
 						}
 					});
+
+					logger.info(String.format("Memory Used %s/%s",
+							MemoryUtils.humanReadableByteCount(
+									Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory(), true),
+							MemoryUtils.humanReadableByteCount(Runtime.getRuntime().totalMemory(), true)));
+					logger.info("Running Garbage Collector");
+					s.close();
+					System.gc();
+					logger.info(String.format("Memory Used %s/%s",
+							MemoryUtils.humanReadableByteCount(Runtime.getRuntime().freeMemory(), true),
+							MemoryUtils.humanReadableByteCount(Runtime.getRuntime().totalMemory(), true)));
 				} catch (CompressorException | IOException e) {
 					e.printStackTrace();
 				}
 				logger.info(String.format("%d/%d", processedFiles.incrementAndGet(), files.size()));
 			});
-			writer.close();
+			writer.close(new ProgressListener() {
+				@Override
+				public void notifyProgress(float level, String message) {
+					logger.info(message);
+				}
+			});
+			logger.info(String.format("Memory Used %s/%s",
+					MemoryUtils.humanReadableByteCount(Runtime.getRuntime().freeMemory(), true),
+					MemoryUtils.humanReadableByteCount(Runtime.getRuntime().totalMemory(), true)));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
+		logger.info(String.format("Memory Used %s/%s",
+				MemoryUtils.humanReadableByteCount(Runtime.getRuntime().freeMemory(), true),
+				MemoryUtils.humanReadableByteCount(Runtime.getRuntime().totalMemory(), true)));
 	}
 
 	public static void mergeFiles(List<String> filesToMerge, String fileOut, Lang lang, CompressionFormat cf)

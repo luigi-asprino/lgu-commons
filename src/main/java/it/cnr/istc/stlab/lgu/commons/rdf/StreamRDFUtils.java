@@ -185,7 +185,7 @@ public class StreamRDFUtils {
 				e.printStackTrace();
 			}
 			return ts;
-		});
+		}).onClose(() -> lineStream.close());
 	}
 
 	public static Stream<TripleString> createFilteredTripleStream(String f, CharSequence s, CharSequence p,

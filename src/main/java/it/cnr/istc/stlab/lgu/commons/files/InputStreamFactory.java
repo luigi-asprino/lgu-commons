@@ -34,6 +34,7 @@ public class InputStreamFactory {
 		BufferedReader br = new BufferedReader(new InputStreamReader(is), BUFFER_SIZE);
 		Stream<String> result = br.lines().onClose(() -> {
 			try {
+				is.close();
 				br.close();
 			} catch (IOException e) {
 				e.printStackTrace();
