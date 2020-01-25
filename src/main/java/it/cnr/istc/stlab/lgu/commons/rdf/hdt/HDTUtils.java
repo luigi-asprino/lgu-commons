@@ -79,6 +79,8 @@ public class HDTUtils {
 					e.printStackTrace();
 				}
 			});
+
+			logger.info(String.format("Number of lines %s", pc.value()));
 		} else {
 			ClosableIterator<TripleString> itsw = StreamRDFUtils.createIteratorTripleStringWrapperFromFile(fileIn);
 			ProgressCounter pc = new ProgressCounter();

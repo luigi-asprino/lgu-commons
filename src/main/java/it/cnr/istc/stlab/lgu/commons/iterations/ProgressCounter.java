@@ -66,5 +66,9 @@ public class ProgressCounter {
 			System.out.println(mPrint);
 		}
 	}
+	
+	public long value() {
+		return progress.longValue();
+	}
 
 }
