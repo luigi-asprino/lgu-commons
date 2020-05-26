@@ -24,21 +24,23 @@ public class URLUtils {
 		return uri.substring(0, prefixLastCharacter + 1);
 	}
 
-	public static String getID(String uri) {
-		int prefixLastCharacter = uri.lastIndexOf('#');
-		if (prefixLastCharacter < 0) {
-			prefixLastCharacter = uri.lastIndexOf('/');
+	public static String getID(final String uri) {
+		for (int i = uri.length() - 1; i >= 0; i--) {
+			if (uri.charAt(i) == '#' | uri.charAt(i) == '/' | uri.charAt(i) == ':') {
+				return uri.substring(i + 1);
+			}
 		}
-		if (prefixLastCharacter < 0) {
-			prefixLastCharacter = uri.lastIndexOf(':');
+		return uri;
+	}
+	
+	public static CharSequence getID(final CharSequence uri) {
+
+		for (int i = uri.length() - 1; i >= 0; i--) {
+			if (uri.charAt(i) == '#' | uri.charAt(i) == '/' | uri.charAt(i) == ':') {
+				return uri.subSequence(i + 1,uri.length()-1);
+			}
 		}
-		if (prefixLastCharacter < 0) {
-			prefixLastCharacter = uri.length() - 1;
-		}
-		if (prefixLastCharacter + 1 == uri.length()) {
-			return uri;
-		}
-		return uri.substring(prefixLastCharacter + 1);
+		return uri;
 	}
 
 	public static void main(String[] args) {

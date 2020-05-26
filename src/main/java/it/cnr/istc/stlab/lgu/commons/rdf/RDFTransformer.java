@@ -12,7 +12,7 @@ import org.apache.jena.tdb.TDBFactory;
 public class RDFTransformer {
 
 	public enum Format {
-		TTL, TDB, NT
+		TTL, TDB, NT,NQ
 	}
 
 	private Format in, out;
@@ -45,6 +45,9 @@ public class RDFTransformer {
 			ds.getDefaultModel().add(m);
 			ds.commit();
 			ds.close();
+			break;
+		case NQ:
+			RDFDataMgr.read(ds, pathFileIn);
 			break;
 		default:
 			break;

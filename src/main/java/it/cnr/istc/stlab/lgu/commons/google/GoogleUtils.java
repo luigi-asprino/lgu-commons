@@ -68,4 +68,31 @@ public class GoogleUtils {
 		return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
 	}
 
+	/**
+	 * Creates an authorized Credential object.
+	 * 
+	 * @param HTTP_TRANSPORT The network HTTP Transport.
+	 * @return An authorized Credential object.
+	 * @throws IOException If the credentials.json file cannot be found.
+	 */
+	public static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT, String credentials)
+			throws IOException {
+
+		logger.info("Getting credentials");
+		logger.trace("Credentional file exists? {}", new File(credentials).exists());
+		logger.trace("FILE CREDENTIALS : {}", FileUtils.readFile(credentials));
+
+		// Load client secrets.
+		InputStream in = new FileInputStream(new File(credentials));
+		GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
+
+		// Build flow and trigger user authorization request.
+		GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY,
+				clientSecrets, SCOPES)
+						.setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
+						.setAccessType("offline").build();
+		LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
+		return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
+	}
+
 }

@@ -30,4 +30,5 @@ public class RDFUtils {
 		it.cnr.istc.stlab.lgu.commons.files.File f = new it.cnr.istc.stlab.lgu.commons.files.File(filename);
 		return f.getFormat();
 	}
+	
 }
