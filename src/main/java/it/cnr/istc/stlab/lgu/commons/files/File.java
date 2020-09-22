@@ -50,7 +50,7 @@ public class File extends java.io.File {
 	}
 
 	public enum CompressionFormat {
-		GZ, BZ2
+		GZ, BZ2, NO_COMPRESSION
 	}
 
 	public final static String[] COMPRESSION_EXTENSIONS = new String[] { "gz", "bz2" };

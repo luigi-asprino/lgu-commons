@@ -194,5 +194,16 @@ public class StreamRDFUtils {
 			return t.match(new TripleString(s, p, o));
 		});
 	}
+	
+	public static void main(String[] args) {
+		try {
+			cleanFile("/Users/lgu/Desktop/quarantine.nt", "/Users/lgu/Desktop/quarantine_c.nt", CompressionFormat.NO_COMPRESSION, RDFFormat.NT);
+		} catch (CompressorException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 }
