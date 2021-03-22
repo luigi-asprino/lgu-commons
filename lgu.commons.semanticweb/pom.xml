@@ -1,0 +1,90 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>it.cnr.istc.stlab</groupId>
+		<artifactId>lgu.commons</artifactId>
+		<version>0.0.8</version>
+	</parent>
+	<artifactId>lgu.commons.semanticweb</artifactId>
+
+
+	<dependencies>
+
+		<!-- https://mvnrepository.com/artifact/org.apache.jena/jena-arq -->
+		<dependency>
+			<groupId>org.apache.jena</groupId>
+			<artifactId>jena-arq</artifactId>
+			<version>3.17.0</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.jena/jena-core -->
+		<dependency>
+			<groupId>org.apache.jena</groupId>
+			<artifactId>jena-core</artifactId>
+			<version>3.17.0</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.jena/jena-tdb -->
+		<dependency>
+			<groupId>org.apache.jena</groupId>
+			<artifactId>jena-tdb</artifactId>
+			<version>3.17.0</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.jena/jena-iri -->
+		<dependency>
+			<groupId>org.apache.jena</groupId>
+			<artifactId>jena-iri</artifactId>
+			<version>3.17.0</version>
+		</dependency>
+
+
+
+		<dependency>
+			<groupId>org.rdfhdt</groupId>
+			<artifactId>hdt-java-core</artifactId>
+			<version>2.1.1-SNAPSHOT-LGU</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.jena</groupId>
+					<artifactId>jena-arq</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.jena</groupId>
+					<artifactId>jena-base</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.jena</groupId>
+					<artifactId>jena-core</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.7</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.7</version>
+		</dependency>
+
+		<dependency>
+			<groupId>it.cnr.istc.stlab</groupId>
+			<artifactId>lgu.commons.io</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>it.cnr.istc.stlab</groupId>
+			<artifactId>lgu.commons.misc</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+
+	</dependencies>
+</project>

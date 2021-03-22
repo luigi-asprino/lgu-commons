@@ -1,0 +1,8 @@
+.DS_Store
+.settings/
+.classpath
+.project
+log/
+target/
+lgu.commons.nlp/ukb-3.2/wikipedia_en_2013.tar.bz2
+lgu.commons.server/lgu.commons.server-0.0.8.jar

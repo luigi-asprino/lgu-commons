@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>it.cnr.istc.stlab</groupId>
+		<artifactId>lgu.commons</artifactId>
+		<version>0.0.8</version>
+	</parent>
+	<artifactId>lgu.commons.nlp</artifactId>
+
+	<dependencies>
+		<!-- https://mvnrepository.com/artifact/edu.stanford.nlp/stanford-corenlp -->
+		<dependency>
+			<groupId>edu.stanford.nlp</groupId>
+			<artifactId>stanford-corenlp</artifactId>
+			<version>4.2.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>edu.stanford.nlp</groupId>
+			<artifactId>stanford-corenlp</artifactId>
+			<version>4.2.0</version>
+			<classifier>models</classifier>
+		</dependency>
+
+		<dependency>
+			<groupId>it.unimi.dsi</groupId>
+			<artifactId>fastutil</artifactId>
+			<version>7.2.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.jsoniter</groupId>
+			<artifactId>jsoniter</artifactId>
+			<version>0.9.12</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.12.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>it.cnr.istc.stlab</groupId>
+			<artifactId>lgu.commons.io</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>it.cnr.istc.stlab</groupId>
+			<artifactId>lgu.commons.semanticweb</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+	</dependencies>
+</project>
