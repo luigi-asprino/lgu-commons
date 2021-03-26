@@ -17,9 +17,6 @@ import org.apache.jena.vocabulary.SKOS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import it.cnr.istc.stlab.lgu.commons.nlp.model.AnnotatedText;
 import it.cnr.istc.stlab.lgu.commons.nlp.model.AnnotationType;
 import it.cnr.istc.stlab.lgu.commons.nlp.model.ScoredAnnotation;
