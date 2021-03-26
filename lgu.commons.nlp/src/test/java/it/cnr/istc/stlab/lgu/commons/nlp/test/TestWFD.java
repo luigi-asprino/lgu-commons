@@ -13,6 +13,7 @@ import it.cnr.istc.stlab.lgu.commons.nlp.wsd.UKB;
 
 public class TestWFD {
 
+	@Ignore
 	@Test
 	public void testWFD() {
 

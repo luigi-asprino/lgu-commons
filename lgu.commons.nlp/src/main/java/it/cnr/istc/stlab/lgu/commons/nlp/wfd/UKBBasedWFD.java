@@ -47,7 +47,7 @@ public class UKBBasedWFD {
 				c.incrementAndGet();
 			});
 			logger.info("Number of mappings {}", c.get());
-			System.out.println("Number of mappings " + c.get());
+//			System.out.println("Number of mappings " + c.get());
 		} catch (ConfigurationException e) {
 			e.printStackTrace();
 		}
