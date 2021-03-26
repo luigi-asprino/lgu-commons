@@ -14,6 +14,7 @@ public class ProgressCounter {
 	private String prefix;
 	private NumberFormat format;
 	private Logger logger;
+	private org.slf4j.Logger slf4jLogger;
 
 	public ProgressCounter() {
 		check = 10000;
@@ -41,6 +42,15 @@ public class ProgressCounter {
 		return this;
 	}
 
+	public ProgressCounter setSLF4jLogger(org.slf4j.Logger logger) {
+		this.slf4jLogger = logger;
+		return this;
+	}
+	
+	public long currentValue() {
+		return progress.get();
+	}
+
 	public void increase() {
 		if (progress.incrementAndGet() % check == 0) {
 			if (!absolute) {
@@ -62,11 +72,13 @@ public class ProgressCounter {
 
 		if (logger != null) {
 			logger.info(mPrint);
+		} else if (slf4jLogger != null) {
+			slf4jLogger.info(mPrint);
 		} else {
 			System.out.println(mPrint);
 		}
 	}
-	
+
 	public long value() {
 		return progress.longValue();
 	}

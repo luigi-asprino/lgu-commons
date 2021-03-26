@@ -1,12 +1,15 @@
 package it.cnr.istc.stlab.lgu.commons.server;
 
+import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Set;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.compress.utils.Sets;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.slf4j.Logger;
@@ -25,11 +28,12 @@ public class WSD {
 
 	private static final Logger logger = LoggerFactory.getLogger(WSD.class);
 
+	private static final Set<String> RDF_SERIALIZATION = Sets.newHashSet("TTL", "ttl", "NT", "nt");
+
 	@GET
 	public Response getdisambiguate(@QueryParam(value = "text") String text,
 			@QueryParam(value = "senseInventory") String senseInventory,
-			@QueryParam(value = "serialization") String serialization,
-			@QueryParam(value = "uri") String uri) {
+			@QueryParam(value = "serialization") String serialization, @QueryParam(value = "uri") String uri) {
 
 		logger.trace("Disambigate {} senseInventory {}  lang {}", text, senseInventory, serialization);
 
@@ -51,7 +55,17 @@ public class WSD {
 		}
 		StringWriter sw = new StringWriter();
 		if (serialization != null) {
-			m.write(sw, serialization);
+			if (RDF_SERIALIZATION.contains(serialization)) {
+				m.write(sw, serialization);
+			} else if (serialization.equalsIgnoreCase("json")) {
+				try {
+					Utils.getObjectMapper().writeValue(sw, at);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} else {	
+				logger.warn("Serialization {} unavailable, use json by default", serialization);
+			}
 		} else {
 			m.write(sw);
 		}
