@@ -17,11 +17,11 @@ import org.rdfhdt.hdt.triples.TripleString;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
 
+import it.cnr.istc.stlab.lgu.commons.io.streams.InputStreamFactory;
 import it.cnr.istc.stlab.lgu.commons.misc.ProgressCounter;
 import it.cnr.istc.stlab.lgu.commons.semanticweb.files.SWFileUtils;
 import it.cnr.istc.stlab.lgu.commons.semanticweb.iterators.ClosableIterator;
 import it.cnr.istc.stlab.lgu.commons.semanticweb.iterators.ClosableIteratorFromInputStream;
-import it.cnr.istc.stlab.lgu.commons.streams.InputStreamFactory;
 
 public class StreamRDFUtils {
 

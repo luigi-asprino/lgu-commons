@@ -14,7 +14,9 @@ public class ProgressCounter {
 	private String prefix;
 	private NumberFormat format;
 	private Logger logger;
+	private long t0;
 	private org.slf4j.Logger slf4jLogger;
+	private boolean printRate;
 
 	public ProgressCounter() {
 		check = 10000;
@@ -35,6 +37,7 @@ public class ProgressCounter {
 	private void init() {
 		format = NumberFormat.getInstance();
 		format.setGroupingUsed(true);
+		t0 = System.currentTimeMillis();
 	}
 
 	public ProgressCounter setLogger(Logger logger) {
@@ -46,7 +49,7 @@ public class ProgressCounter {
 		this.slf4jLogger = logger;
 		return this;
 	}
-	
+
 	public long currentValue() {
 		return progress.get();
 	}
@@ -68,7 +71,7 @@ public class ProgressCounter {
 
 	private void logMessage(String m) {
 
-		String mPrint = prefix == null ? m : prefix + " " + m;
+		String mPrint = prefix == null ? m + " " + attachRate() : prefix + " " + m + " " + attachRate();
 
 		if (logger != null) {
 			logger.info(mPrint);
@@ -81,6 +84,20 @@ public class ProgressCounter {
 
 	public long value() {
 		return progress.longValue();
+	}
+
+	public void setPrintRate(boolean printRate) {
+		this.printRate = printRate;
+	}
+
+	private String attachRate() {
+		if (printRate) {
+			long t1 = System.currentTimeMillis();
+			long elapsed = t1 - t0;
+			double timePerItem = ((double) elapsed) / ((double) progress.longValue());
+			return timePerItem + "ms per item";
+		}
+		return "";
 	}
 
 }

@@ -7,7 +7,7 @@ import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFLanguages;
 
-import it.cnr.istc.stlab.lgu.commons.streams.InputStreamFactory;
+import it.cnr.istc.stlab.lgu.commons.io.streams.InputStreamFactory;
 
 public class Prova {
 	

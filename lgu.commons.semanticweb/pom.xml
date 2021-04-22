@@ -18,6 +18,12 @@
 			<groupId>org.apache.jena</groupId>
 			<artifactId>jena-arq</artifactId>
 			<version>3.17.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>jcl-over-slf4j</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.apache.jena/jena-core -->
 		<dependency>
@@ -38,8 +44,6 @@
 			<version>3.17.0</version>
 		</dependency>
 
-
-
 		<dependency>
 			<groupId>org.rdfhdt</groupId>
 			<artifactId>hdt-java-core</artifactId>
@@ -56,6 +60,10 @@
 				<exclusion>
 					<groupId>org.apache.jena</groupId>
 					<artifactId>jena-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-jdk14</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>

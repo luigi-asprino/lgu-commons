@@ -1,13 +1,15 @@
-package it.cnr.istc.stlab.lgu.commons.compression;
+package it.cnr.istc.stlab.lgu.commons.io.compression;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.compress.compressors.CompressorException;
 
-import it.cnr.istc.stlab.lgu.commons.streams.InputStreamFactory;
+import it.cnr.istc.stlab.lgu.commons.io.streams.InputStreamFactory;
 
 public class CompressionUtils {
 
@@ -30,6 +32,17 @@ public class CompressionUtils {
 		for (int i = 0; i < numberOfLines; i++) {
 			System.out.println(br.readLine());
 		}
+	}
+
+	public static byte[] compressString(String s) throws IOException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		GZIPOutputStream zos = new GZIPOutputStream(baos);
+
+		zos.write(s.getBytes());
+		zos.finish();
+		zos.flush();
+
+		return baos.toByteArray();
 	}
 
 }

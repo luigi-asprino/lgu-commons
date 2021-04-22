@@ -1,4 +1,4 @@
-package it.cnr.istc.stlab.lgu.commons.streams;
+package it.cnr.istc.stlab.lgu.commons.io.streams;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;

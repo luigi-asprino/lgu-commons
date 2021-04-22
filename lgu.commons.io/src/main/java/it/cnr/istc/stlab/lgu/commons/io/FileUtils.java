@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -78,6 +80,21 @@ public class FileUtils {
 
 			}
 			result = sb.toString();
+			br.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	public static List<String> readFileToList(String filename) {
+		List<String> result = new ArrayList<>();
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(new File(filename)));
+			String line;
+			while ((line = br.readLine()) != null) {
+				result.add(line);
+			}
 			br.close();
 		} catch (Exception e) {
 			e.printStackTrace();
