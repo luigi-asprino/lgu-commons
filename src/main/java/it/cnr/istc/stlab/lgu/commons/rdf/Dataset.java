@@ -25,7 +25,6 @@ public class Dataset {
 
 	private static Logger logger = LoggerFactory.getLogger(Dataset.class);
 
-	private static Dataset instance;
 	private List<HDT> hdts = new ArrayList<>();
 	private List<String> tripleFiles = new ArrayList<>();
 	private List<String> quadsFiles = new ArrayList<>();
@@ -60,9 +59,9 @@ public class Dataset {
 	}
 
 	public static Dataset getInstanceFromFileList(String[] files) throws IOException {
-		if (instance != null) {
-			return instance;
-		}
+//		if (instance != null) {
+//			return instance;
+//		}
 
 		List<HDT> hdts = new ArrayList<>();
 		List<String> plainfiles = new ArrayList<>();
@@ -95,8 +94,7 @@ public class Dataset {
 				}
 			}
 		}
-		instance = new Dataset(plainfiles, hdts);
-		return instance;
+		return new Dataset(plainfiles, hdts);
 	}
 
 	public Iterator<TripleString> search(CharSequence s, CharSequence p, CharSequence o)

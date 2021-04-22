@@ -22,6 +22,14 @@ public class QueryExecutionRetrieverWithLimitAndOffset {
 		this.limit = limit;
 		this.sparqlEndpointURL = sparqlEndpointURL;
 	}
+	
+	public QueryExecutionRetrieverWithLimitAndOffset(String query, String sparqlEndpointURL, int limit, int offset) {
+		super();
+		this.query = query;
+		this.limit = limit;
+		this.sparqlEndpointURL = sparqlEndpointURL;
+		this.currentOffset=offset;
+	}
 
 	public QueryExecution next() {
 
