@@ -125,7 +125,7 @@
 		<apachejena.version>3.11.0</apachejena.version>
 		<apachepoi.version>3.14</apachepoi.version>
 		<commonsbeanutils.version>1.9.4</commonsbeanutils.version>
-		<commonsio.version>2.6</commonsio.version>
+		<commonsio.version>2.7</commonsio.version>
 		<googleapis.version>v4-rev581-1.25.0</googleapis.version>
 		<googlemapsapi.version>0.10.1</googlemapsapi.version>
 		<guava.version>29.0-jre</guava.version>
