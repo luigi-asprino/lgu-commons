@@ -252,5 +252,6 @@
 		<module>lgu.commons.semanticweb</module>
 		<module>lgu.commons.nlp</module>
 		<module>lgu.commons.server</module>
+		<module>lgu.commons.lang</module>
 	</modules>
 </project>

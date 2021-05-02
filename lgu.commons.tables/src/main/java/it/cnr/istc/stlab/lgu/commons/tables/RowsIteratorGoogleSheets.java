@@ -15,7 +15,6 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
-
 public class RowsIteratorGoogleSheets implements RowsIterator {
 
 	private static Logger logger = LoggerFactory.getLogger(RowsIterator.class);
@@ -52,7 +51,5 @@ public class RowsIteratorGoogleSheets implements RowsIterator {
 		}
 		return result;
 	}
-	
-	
 
 }
