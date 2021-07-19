@@ -119,5 +119,20 @@ public class FileUtils {
 		File file = new File(filePath);
 		return file.delete();
 	}
+	
+	public static List<String> getFilesUnderTreeRec(String filePath) {
+		List<String> result = new ArrayList<String>();
+
+		File f = new File(filePath);
+		for (File child : f.listFiles()) {
+			if (child.isDirectory()) {
+				result.addAll(getFilesUnderTreeRec(child.getAbsolutePath()));
+			} else {
+				result.add(child.getAbsolutePath());
+			}
+		}
+
+		return result;
+	}
 
 }

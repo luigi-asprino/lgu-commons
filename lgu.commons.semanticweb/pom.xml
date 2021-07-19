@@ -44,7 +44,7 @@
 			<version>3.17.0</version>
 		</dependency>
 
-		<dependency>
+		<!-- dependency>
 			<groupId>org.rdfhdt</groupId>
 			<artifactId>hdt-java-core</artifactId>
 			<version>2.1.1-SNAPSHOT-LGU</version>
@@ -66,7 +66,32 @@
 					<artifactId>slf4j-jdk14</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency-->
+		
+		<dependency>
+			<groupId>org.rdfhdt</groupId>
+			<artifactId>hdt-java-core</artifactId>
+			<version>2.1.2</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.jena</groupId>
+					<artifactId>jena-arq</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.jena</groupId>
+					<artifactId>jena-base</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.jena</groupId>
+					<artifactId>jena-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-jdk14</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
+		
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -92,7 +117,6 @@
 			<artifactId>lgu.commons.misc</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 
 	</dependencies>
 </project>
