@@ -34,6 +34,12 @@ public class ProgressCounter {
 		return this;
 	}
 
+	public void setCheckpoint(long check) {
+		if (check > 0) {
+			this.check = check;
+		}
+	}
+
 	private void init() {
 		format = NumberFormat.getInstance();
 		format.setGroupingUsed(true);
