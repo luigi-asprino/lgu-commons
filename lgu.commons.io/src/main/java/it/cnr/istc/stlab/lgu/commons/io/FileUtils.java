@@ -10,6 +10,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -136,18 +137,15 @@ public class FileUtils {
 	}
 
 	public static List<String> readFileToListString(String filename) {
-		List<String> result = new ArrayList<String>();
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(filename));
-			String line;
-			while ((line = br.readLine()) != null) {
-				result.add(line);
-			}
+			List<String> result = br.lines().collect(Collectors.toList());
 			br.close();
-		} catch (Exception e) {
+			return result;
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return result;
+		return new ArrayList<>();
 	}
 
 }
