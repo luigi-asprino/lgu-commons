@@ -61,7 +61,7 @@ public class FileUtils {
 		br.close();
 		return result;
 	}
-	
+
 	public static String readFile(String filename) {
 		return readFile(filename, false);
 	}
@@ -86,7 +86,7 @@ public class FileUtils {
 		}
 		return result;
 	}
-	
+
 	public static List<String> readFileToList(String filename) {
 		List<String> result = new ArrayList<>();
 		try {
@@ -101,7 +101,7 @@ public class FileUtils {
 		}
 		return result;
 	}
-	
+
 	public static String toTextFile(String input, String filePath) throws IOException {
 
 		File f = new File(filePath);
@@ -114,12 +114,12 @@ public class FileUtils {
 		return f.getAbsolutePath();
 
 	}
-	
+
 	public static boolean deleteFile(String filePath) {
 		File file = new File(filePath);
 		return file.delete();
 	}
-	
+
 	public static List<String> getFilesUnderTreeRec(String filePath) {
 		List<String> result = new ArrayList<String>();
 
@@ -132,6 +132,21 @@ public class FileUtils {
 			}
 		}
 
+		return result;
+	}
+
+	public static List<String> readFileToListString(String filename) {
+		List<String> result = new ArrayList<String>();
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(filename));
+			String line;
+			while ((line = br.readLine()) != null) {
+				result.add(line);
+			}
+			br.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return result;
 	}
 
