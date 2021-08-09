@@ -26,6 +26,10 @@ public class ProgressCounter {
 
 	public ProgressCounter(long until) {
 		check = until / steps;
+		if (check == 0) {
+			check = 1;
+			steps = 100 / until;
+		}
 		init();
 	}
 
