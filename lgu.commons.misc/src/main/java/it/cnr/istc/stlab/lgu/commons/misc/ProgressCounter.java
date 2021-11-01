@@ -25,10 +25,15 @@ public class ProgressCounter {
 	}
 
 	public ProgressCounter(long until) {
-		check = until / steps;
-		if (check == 0) {
-			check = 1;
-			steps = 100 / until;
+		if (until > 0) {
+			check = until / steps;
+			if (check == 0) {
+				check = 1;
+				steps = 100 / until;
+			}
+		} else {
+			check = 10000;
+			absolute = true;
 		}
 		init();
 	}
@@ -38,10 +43,11 @@ public class ProgressCounter {
 		return this;
 	}
 
-	public void setCheckpoint(long check) {
+	public ProgressCounter setCheckpoint(long check) {
 		if (check > 0) {
 			this.check = check;
 		}
+		return this;
 	}
 
 	private void init() {
@@ -67,28 +73,25 @@ public class ProgressCounter {
 	public void increase() {
 		if (progress.incrementAndGet() % check == 0) {
 			if (!absolute) {
-				long perc = (progress.longValue() / check) * steps;
-				if (perc == 100) {
-					logMessage(perc + "%");
-				} else {
-					logMessage(perc + "% ");
-				}
+				logMessage(((progress.longValue() / check) * steps) + "%");
 			} else {
 				logMessage(format.format(progress) + " ");
 			}
 		}
+
+	}
+
+	private String formatMessage(String m) {
+		return String.format("%s %s %s", prefix, m, attachRate());
 	}
 
 	private void logMessage(String m) {
-
-		String mPrint = prefix == null ? m + " " + attachRate() : prefix + " " + m + " " + attachRate();
-
 		if (logger != null) {
-			logger.info(mPrint);
+			logger.info(formatMessage(m));
 		} else if (slf4jLogger != null) {
-			slf4jLogger.info(mPrint);
+			slf4jLogger.info(formatMessage(m));
 		} else {
-			System.out.println(mPrint);
+			System.out.println(formatMessage(m));
 		}
 	}
 
@@ -96,8 +99,9 @@ public class ProgressCounter {
 		return progress.longValue();
 	}
 
-	public void setPrintRate(boolean printRate) {
+	public ProgressCounter setPrintRate(boolean printRate) {
 		this.printRate = printRate;
+		return this;
 	}
 
 	private String attachRate() {
